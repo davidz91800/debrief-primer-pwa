@@ -6,9 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Debrief Primer V1.2 - Advanced Debriefing Tool">
     <meta name="theme-color" content="#0f172a">
-    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="icon" href="./icons/icon-192.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="./icons/icon-192.svg">
@@ -2649,14 +2646,10 @@ Based strictly on the analysis above, write the perfect Lesson Learned Summary i
         Ui.init(); Storage.load(); Render.init(); Tooltip.init();
     </script>
     <script>
-        (function registerNoCachePwa() {
+        (function registerPwa() {
             if (!('serviceWorker' in navigator)) return;
             window.addEventListener('load', async () => {
                 try {
-                    if ('caches' in window) {
-                        const keys = await caches.keys();
-                        await Promise.all(keys.map((key) => caches.delete(key)));
-                    }
                     await navigator.serviceWorker.register('./sw.js', { scope: './' });
                 } catch (error) {
                     console.warn('Service worker registration failed:', error);
