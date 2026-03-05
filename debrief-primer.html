@@ -2612,19 +2612,24 @@ Based strictly on the analysis above, write the perfect Lesson Learned Summary i
 
             // Construct Prompt
             const prompt = `Act as an expert Debrief Leader and Instructor Pilot using the "Debrief Primer" methodology.
-         Your task is to write a comprehensive "Final Summary & Trends" for the mission report.
+         Your task is to write a very short "Final Summary & Trends" for the mission report.
 
          INPUT DATA:
          ${sections.join('\n\n')}
 
          INSTRUCTIONS:
-         1. Identify Trends: Look for common threads across the DFPs/LPs (e.g. recurring root causes like "Perception - Visual", specific communication failures, or planning gaps).
-         2. Assess Effectiveness: Briefly state if the core mission objectives were likely met based on the analysis.
-         3. Synthesize: Write a cohesive summary that highlights the main takeaways and the "big picture" lessons.
-         4. Output Format:
-            - Provide the text in French (Francais).
-            - Provide the text in English (Anglais).
-            - Use a professional, constructive, and instructional tone.`;
+         1. Identify only the most important trends and takeaways.
+         2. Keep the answer extremely concise. No paragraph. No introduction. No conclusion.
+         3. Output only bullet points.
+         4. Maximum format:
+            - French (Francais): 3 bullet points maximum
+            - English (Anglais): 3 bullet points maximum
+         5. Each bullet must be short and operational.
+         6. Prioritize:
+            - mission effectiveness
+            - main recurring root cause or trend
+            - key corrective action / lesson learned
+         7. Use a professional, constructive, and instructional tone.`;
 
             navigator.clipboard.writeText(prompt).then(() => {
                 const btn = document.getElementById('btn-copy-summary-prompt');
