@@ -1,0 +1,2270 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Debrief Primer V1.2 - Advanced Debriefing Tool">
+    <meta name="theme-color" content="#0f172a">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" href="./icons/icon-192.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="./icons/icon-192.svg">
+    <title>Debrief Primer V1.2 - Advanced Debriefing Tool</title>
+    <style>
+        /* --- CSS VARIABLES & THEME --- */
+        :root {
+            --bg-color: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-primary: #3b82f6;
+            --accent-primary-hover: #2563eb;
+            --accent-secondary: #f97316;
+            --accent-danger: #ef4444;
+            --accent-success: #10b981;
+            --border-color: #334155;
+            --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --radius-md: 0.5rem;
+        }
+
+        /* --- RESET & BASE --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            height: 100vh;
+            /* Fallback */
+            height: 100dvh;
+            /* Mobile viewport fix */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            -webkit-text-size-adjust: 100%;
+            /* Prevent font scaling in landscape */
+            text-size-adjust: 100%;
+        }
+
+        input,
+        textarea,
+        select {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.75rem 0.5rem;
+            /* Larger touch target */
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 16px;
+            /* Prevent iOS zoom */
+        }
+
+        textarea {
+            resize: none;
+            overflow-y: hidden;
+            min-height: 80px;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: 2px solid var(--accent-primary);
+            border-color: transparent;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+        }
+
+        /* --- UTILITIES --- */
+        .hidden-on-screen {
+            display: none !important;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-col {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .gap-xs {
+            gap: 0.25rem;
+        }
+
+        .gap-sm {
+            gap: var(--spacing-sm);
+        }
+
+        .gap-md {
+            gap: var(--spacing-md);
+        }
+
+        .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .p-2 {
+            padding: 0.5rem;
+        }
+
+        .p-4 {
+            padding: 1rem;
+        }
+
+        .text-xs {
+            font-size: 0.75rem;
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+        }
+
+        .text-lg {
+            font-size: 1.125rem;
+        }
+
+        .text-xl {
+            font-size: 1.25rem;
+        }
+
+        .text-muted {
+            color: var(--text-muted);
+        }
+
+        .text-accent {
+            color: var(--accent-primary);
+        }
+
+        .font-bold {
+            font-weight: 600;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-md);
+        }
+
+        .h-full {
+            height: 100%;
+        }
+
+        .overflow-y-auto {
+            overflow-y: auto;
+        }
+
+        .truncate {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .align-top {
+            vertical-align: top;
+        }
+
+        /* --- LAYOUT --- */
+        #app-header,
+        #app-footer {
+            height: 60px;
+            background: var(--bg-card);
+            padding: 0 var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-color: var(--border-color);
+            border-style: solid;
+            z-index: 10;
+        }
+
+        #app-header {
+            border-bottom-width: 1px;
+            position: relative;
+            /* Context for absolute centering of tabs */
+            padding-right: var(--spacing-lg);
+            /* Ensure padding for actions */
+        }
+
+        #mission-status {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 400px;
+            text-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+            letter-spacing: 0.5px;
+        }
+
+        #app-main {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--spacing-lg);
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        #app-footer {
+            height: 80px;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-color);
+            padding: 0 var(--spacing-lg);
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        /* --- COMPONENTS --- */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-primary-hover);
+        }
+
+        .btn-premium-add {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.25rem;
+            border-radius: 999px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .btn-premium-add:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            background: linear-gradient(135deg, #60a5fa, #2563eb);
+        }
+
+        .btn-premium-add:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .btn-premium-add .plus-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        @media (hover: hover) {
+            .btn-primary:hover {
+                background: var(--accent-primary-hover);
+            }
+
+            .btn-secondary:hover {
+                border-color: var(--text-main);
+                color: var(--text-main);
+            }
+
+            .nav-tab:hover {
+                background: var(--bg-card-hover);
+                color: var(--text-main);
+            }
+
+            .dfp-chip:hover {
+                border-color: var(--accent-primary);
+            }
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--text-main);
+            color: var(--text-main);
+        }
+
+        .btn-icon {
+            padding: 0.25rem;
+            font-size: 1.2rem;
+            background: transparent;
+            color: var(--text-muted);
+        }
+
+        .btn-icon:hover {
+            color: var(--text-main);
+        }
+
+        .tag-btn {
+            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .tag-btn.selected {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent-primary);
+        }
+
+        /* --- TIMELINE --- */
+        .timeline-item {
+            display: flex;
+            gap: 1rem;
+            padding: 0.75rem;
+            border-left: 2px solid var(--border-color);
+            margin-left: 1rem;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 1rem;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 2px solid var(--accent-primary);
+        }
+
+        .timeline-item.dfp-candidate {
+            background: rgba(249, 115, 22, 0.1);
+            border-left-color: var(--accent-secondary);
+        }
+
+        .timeline-item.dfp-candidate::before {
+            border-color: var(--accent-secondary);
+            background: var(--accent-secondary);
+        }
+
+        .timeline-time {
+            font-family: monospace;
+            color: var(--text-muted);
+            white-space: nowrap;
+            font-size: 0.9rem;
+            margin-top: 2px;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        /* --- INFO-BULLE --- */
+        .info-trigger {
+            cursor: help;
+            color: var(--accent-secondary);
+            margin-left: 0.25rem;
+            font-size: 0.9em;
+        }
+
+        #tooltip-container {
+            position: fixed;
+            display: none;
+            background: #0f172a;
+            border: 1px solid var(--accent-secondary);
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            width: 300px;
+            z-index: 100;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            font-size: 0.9rem;
+            line-height: 1.4;
+            pointer-events: none;
+        }
+
+        #tooltip-container h4 {
+            color: var(--accent-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        /* --- ANALYSIS SPECIFIC --- */
+        .dfp-chip {
+            display: flex;
+            padding: 0;
+            /* Remove padding from container */
+            background: var(--bg-card-hover);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            border: 1px solid transparent;
+            overflow: hidden;
+            min-height: 50px;
+            transition: all 0.2s;
+        }
+
+        .dfp-chip:hover {
+            border-color: var(--accent-primary);
+        }
+
+        .dfp-chip.active {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        /* When active, we need to adjust inner colors if needed, but the indicator stays distinct */
+        .dfp-chip.active .dfp-indicator {
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .dfp-chip.active .dfp-content {
+            background: rgba(255, 255, 255, 0.1);
+            /* Slight highlight on content */
+        }
+
+        .dfp-indicator {
+            width: 20px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 9px;
+            line-height: 1;
+            writing-mode: vertical-lr;
+            /* Vertical text */
+            text-orientation: upright;
+            /* D stacked on F stacked on P */
+            letter-spacing: 1px;
+            user-select: none;
+        }
+
+        .dfp-indicator.type-dfp {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        /* Alternate color for DFP if the chip effectively uses accent-primary when active */
+        .dfp-chip.active .dfp-indicator.type-dfp {
+            background: rgba(0, 0, 0, 0.2);
+            /* Darken slightly when active to show border */
+            color: white;
+        }
+
+        .dfp-indicator.type-lp {
+            background: #cbd5e1;
+            /* Slate-300 */
+            color: #0f172a;
+            /* Slate-900 */
+        }
+
+        .dfp-content {
+            padding: 0.5rem 0.75rem;
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-width: 0;
+        }
+
+        .cf-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 0.5rem;
+            border-left: 4px solid transparent;
+        }
+
+        .cf-item.rc {
+            border-left-color: var(--accent-secondary);
+            background: rgba(249, 115, 22, 0.05);
+        }
+
+        /* --- PREMIUM TOGGLE (Explicit CSS) --- */
+        .premium-toggle {
+            display: flex;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 4px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 4px;
+            user-select: none;
+            backdrop-filter: blur(4px);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .toggle-btn {
+            background: transparent;
+            border: none;
+            color: #64748b;
+            /* text-slate-500 */
+            padding: 6px 16px;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+        }
+
+        .toggle-btn:hover {
+            color: #e2e8f0;
+        }
+
+        .toggle-btn.active-dfp {
+            background: linear-gradient(135deg, #06b6d4, #2563eb);
+            /* cyan-500 to blue-600 */
+            color: white;
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.4);
+            transform: scale(1.05);
+        }
+
+        .toggle-btn.active-lp {
+            background: linear-gradient(135deg, #ffffff, #94a3b8);
+            /* white to slate-400 */
+            color: #0f172a;
+            /* slate-900 */
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* --- NAVIGATION TABS --- */
+        /* --- NAVIGATION TABS --- */
+        .nav-tabs {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            gap: 0.25rem;
+            background: var(--bg-card);
+            padding: 0.25rem;
+            border-radius: 99px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 20;
+            max-width: 60%;
+            /* Prevent overlap with title */
+        }
+
+        .nav-tab {
+            padding: 0.35rem 0.75rem;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+            background: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+        }
+
+        .nav-tab.active {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .nav-tab.completed {
+            color: var(--accent-primary);
+        }
+
+        .nav-tab.completed:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            z-index: 30;
+            /* Above tabs if screen is small */
+        }
+
+        .header-btn {
+            padding: 0.35rem 0.75rem;
+            font-size: 0.8rem;
+            border-radius: var(--radius-md);
+        }
+
+        .btn-nav {
+            padding: 0.75rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-prev {
+            background: var(--bg-card-hover);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-prev:hover {
+            background: var(--bg-card);
+            border-color: var(--text-main);
+            color: var(--text-main);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-next {
+            background: var(--accent-primary);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-next:hover {
+            background: var(--accent-primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        .footer-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            justify-self: end;
+        }
+
+        /* --- PRINT --- */
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            body {
+                background: white !important;
+                color: black;
+                height: auto;
+                overflow: visible;
+                display: block;
+                font-size: 11pt;
+            }
+
+            #app-header,
+            #app-footer,
+            .no-print,
+            .btn,
+            .info-trigger,
+            .btn-icon,
+            .tag-btn {
+                display: none !important;
+            }
+
+            #app-main {
+                padding: 0;
+                margin: 0;
+                max-width: none;
+                overflow: visible;
+            }
+
+            .show-on-print {
+                display: block !important;
+            }
+
+            .card {
+                border: 1px solid #ddd !important;
+                border-left: 4px solid var(--accent-primary) !important;
+                padding: 1rem !important;
+                margin-bottom: 1.5rem !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                background: white !important;
+            }
+
+            /* Ensure DFP/LP sections don't break across pages */
+            [style*="margin-bottom:1.5rem"] {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+
+            /* Keep section headers with their content */
+            .section-title {
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+            }
+
+            /* Final Summary should never be split - push to next page if needed */
+            .print-summary {
+                page-break-before: auto !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+
+            input,
+            textarea {
+                border: none;
+                background: transparent;
+                padding: 0;
+                resize: none;
+                color: black;
+                font-family: inherit;
+                overflow: hidden;
+            }
+
+            .section-title {
+                color: black;
+                border-bottom: 2px solid black;
+                padding-bottom: 5px;
+                margin-bottom: 15px;
+            }
+
+            .text-muted {
+                color: #555;
+            }
+
+            .text-accent,
+            .text-xs,
+            .text-sm {
+                color: black;
+                font-size: inherit;
+            }
+
+            h1,
+            h2,
+            h3 {
+                color: black;
+            }
+
+            /* Print Specific Layouts */
+            .print-header {
+                margin-bottom: 2rem;
+                border-bottom: 4px solid black;
+                padding-bottom: 1rem;
+            }
+
+            .print-obj-list {
+                margin-bottom: 1rem;
+            }
+
+            .print-dfp-box {
+                border: 1px solid #ccc !important;
+                padding: 1rem !important;
+                margin-bottom: 1.5rem !important;
+                page-break-inside: avoid;
+            }
+
+            .print-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 0.5rem;
+            }
+
+            .print-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        /* --- RESPONSIVE / IPAD --- */
+        @media (max-width: 1024px) {
+            #app-main {
+                padding: var(--spacing-md);
+            }
+
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: 1fr;
+                /* Stack columns */
+                gap: 1rem;
+            }
+
+            /* Exceptions where side-by-side still works on tablet landscape */
+            @media (orientation: landscape) {
+                .grid-2 {
+                    grid-template-columns: 1fr 1fr;
+                }
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            .btn {
+                padding: 0.75rem 1rem;
+                /* Easier to tap */
+            }
+
+            .nav-tab {
+                padding: 0.5rem;
+            }
+
+            #app-header h2 {
+                font-size: 1.1rem;
+                /* Scale down title */
+            }
+
+            #mission-status {
+                max-width: 150px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TOOLTIP OVERLAY -->
+    <div id="tooltip-container">
+        <h4 id="tooltip-title"></h4>
+        <div id="tooltip-content"></div>
+    </div>
+
+    <!-- DATA EMBED -->
+    <script id="dfp-data" type="application/json"></script>
+
+    <!-- HEADER -->
+    <header id="app-header">
+        <div class="flex items-center gap-md">
+            <h2 class="font-bold text-accent">Debrief Primer V1.2</h2>
+            <div style="width: 1px; height: 32px; background: var(--border-color);"></div>
+            <div id="mission-status">No Mission Loaded</div>
+        </div>
+        <div class="nav-tabs" id="step-indicator"></div>
+        <div class="header-actions">
+            <!-- Actions moved to footer -->
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main id="app-main">
+        <!-- Views rendered here -->
+    </main>
+
+    <!-- FOOTER -->
+    <footer id="app-footer">
+        <div></div> <!-- Spacer for grid -->
+
+        <div class="flex gap-md">
+            <button id="btn-prev" class="btn btn-nav btn-prev" onclick="prevPage()">
+                <span>â†</span> Previous
+            </button>
+
+            <button id="btn-next" class="btn btn-nav btn-next" onclick="nextPage()">
+                Next <span>â†’</span>
+            </button>
+        </div>
+
+        <div class="footer-actions">
+            <input type="file" id="import-json" style="display:none" accept=".json" onchange="Storage.importJSON(this)">
+            <button id="btn-load-json" class="btn btn-secondary header-btn"
+                onclick="document.getElementById('import-json').click()">0. Load JSON ðŸ“‚</button>
+            <button id="btn-save" class="btn btn-secondary header-btn" onclick="Storage.exportJSON()">1. Export JSON
+                ðŸ’¾</button>
+            <button id="btn-qwi" class="btn btn-secondary header-btn"
+                style="border-color:var(--accent-primary); color:var(--accent-primary)" onclick="Storage.sendQwiEmail()"
+                title="Don't forget to attach the JSON file!">2. Send to QWI ðŸ“§</button>
+            <button id="btn-reset" class="btn btn-secondary header-btn" onclick="Storage.reset()">ðŸ—‘ï¸ Reset</button>
+        </div>
+    </footer>
+
+    <!-- LOGIC -->
+    <script>
+        // --- DATA & CONTENT ---
+        const DEFINITIONS = {
+            "MC": { title: "Mission Commander", text: "Officer in charge of the mission. Responsible for debrief effectiveness." },
+            "DL": { title: "Debrief Leader", text: "Directs reconstruction, analysis, and debrief. Often the MC." },
+            "DDL": { title: "Deputy Debrief Leader", text: "Prepares equipment, takes notes, backs up analysis, manages playback." },
+            "AC": { title: "Aircraft Commander", text: "Responsible for their aircraft/element. Acts as 'mouthpiece' in multi-ship debriefs." },
+            "MissionObjectives": { title: "Mission Objectives", text: "The ultimate goal of the sortie (e.g., 'Safe recovery of hostages'). Defined by higher HQ or Commander's Intent." },
+            "TacticalObjectives": { title: "Tactical Objectives", text: "Specific actions crews must do to achieve mission success (e.g., 'Drop bundles within 50 yards of PI')." },
+            "PerformanceObjectives": { title: "Performance Objectives", text: "Refined metrics for tactical objectives (e.g., 'Â±50ft altitude, Â±5 kts airspeed'). Execution outside these warrants analysis." },
+            "DLO": { title: "Desired Learning Objectives", text: "Additional goals to raise combat capability (e.g., 'Practice defensive reactions'). Optional in training but critical for growth." },
+            "DCP": { title: "Data Collection Plan", text: "Detailed plan of what data to collect, who collects it, and how. Must be solidified BEFORE execution." },
+            "Reconstruction": { title: "Reconstruction", text: "Building the 'Big Picture' of what happened. Includes Admin, Data Consolidation, and High-Speed Playback." },
+            "DFP": { title: "Debrief Focus Point (DFP)", text: "A significant event chosen for deep analysis. Must be phrased as a 'Why...?' question." },
+            "CF": { title: "Contributing Factor (CF)", text: "An event or occurrence that contributed to the DFP. Can be planning, execution, or perception/decision errors." },
+            "RC": { title: "Root Cause (RC)", text: "The one CF that, if avoided, would have prevented the DFP. The 'primary' error." },
+            "RC": { title: "Root Cause (RC)", text: "The one CF that, if avoided, would have prevented the DFP. The 'primary' error." },
+            "IF": { title: "Instructional Fix (IF)", text: "The solution. Using IRAC format to ensure the error is fully understood and corrected." },
+            "IRACV": { title: "I.R.A.C. Methodology", text: "I-Issue (What happened?), R-Reference (What says so? e.g. SOPs), A-Analysis (Why did it happen? connect RC), C-Conclusion (The Fix: 'Next time I will...')" },
+            "IPO": { title: "IPO+S Model", text: "Input, Process, Output + Storage (Products). A systematic way to find the Root Cause." },
+            "ROE": { title: "Rules of Engagement", text: "Rules to keep debrief efficient. E.g., 'Do not speak unless asked', 'Alibis first', etc." },
+            "ALIBIS": { title: "Alibis", text: "Issues with aircraft or systems that affected mission accomplishment. Declared upfront." },
+            "PRODUCTS": { title: "Products", text: "Tapes, cards, and other mission materials. Must be collected and reviewed." },
+            "OVERVIEW": { title: "Overview", text: "Reviewing the planned vs. actual mission execution. Identifying major deviations." },
+            "WHITEBOARD": { title: "Whiteboard", text: "A shared space for collaborative notes, timeline construction, and jotting down raw info before analysis." },
+            "ADMIN": { title: "Admin Phase", text: "Non-tactical issues: Equipment failures, Fall-out aircraft, Brief/Products, ATC delays, Comms..." },
+            "OBJ_AREA": { title: "Objective Area Analysis", text: "Comparison of Expected vs Actual conditions in the target area and their impact." },
+            "FORCE_INT": { title: "Force Integration", text: "Contracts and Deconfliction issues (Intra-flight and with other Blue players)." },
+            "AI_PROMPT": { title: "AI Prompt Generator", text: "Copies a structured prompt designed for AI assistants. Use this to generate a concise Lesson Learned Summary based on your analysis, following the Debrief Primer methodology." },
+            "AI_SUMMARY_PROMPT": { title: "AI Final Summary Prompt", text: "Copies a complete mission context prompt. Use this to ask an AI to write a professional 'Final Summary & Trends' assessment in English and French, based on all objectives and analysis." }
+        };
+
+        const PHASES = [
+            { id: 'setup', label: '1. Setup' },
+            { id: 'prep', label: '2. Prep' },
+            { id: 'execution', label: '3. Exec' },
+            { id: 'reconstruction', label: '4. Recon' },
+            { id: 'analysis', label: '5. Analysis' },
+            { id: 'presentation', label: '6. Output' }
+        ];
+
+        // --- STATE ---
+        const AppState = {
+            currentPhase: 0,
+            activeDfpId: null,
+            executionTemp: { tag: 'General', text: '' },
+            mission: {
+                meta: { title: "", date: new Date().toISOString().split('T')[0], overview: "", aircraftTypes: [], context: "non-COMAO", leadership: "isolated" },
+                roles: { mc: "", dl: "", ddl: "", ac: "" },
+                prep: { missionObjs: [], tacticalObjs: [], perfObjs: [], dlos: [], dcp: [] },
+                exec: { events: [] },
+                recon: {
+                    admin: { equipment: false, fallout: false, products: false, atc: false, comms: false, notes: "" },
+                    objArea: "",
+                    forceInt: { intra: "", package: "" },
+                    dfpCandidates: {}
+                },
+                analysis: { dfps: [] },
+                output: { summary: "" }
+            }
+        };
+
+        // --- HISTORY MODULE ---
+        const History = {
+            stack: [],
+            ptr: -1,
+            maxDepth: 50,
+            push: () => {
+                if (History.ptr < History.stack.length - 1) {
+                    History.stack = History.stack.slice(0, History.ptr + 1);
+                }
+                const state = JSON.stringify(AppState.mission);
+                if (History.stack.length > 0 && History.stack[History.ptr] === state) return;
+
+                History.stack.push(state);
+                if (History.stack.length > History.maxDepth) History.stack.shift();
+                else History.ptr++;
+            },
+            undo: () => {
+                if (History.ptr > 0) {
+                    History.ptr--;
+                    History.restore();
+                }
+            },
+            redo: () => {
+                if (History.ptr < History.stack.length - 1) {
+                    History.ptr++;
+                    History.restore();
+                }
+            },
+            restore: () => {
+                try {
+                    const data = JSON.parse(History.stack[History.ptr]);
+                    Storage.processLoadedData(data);
+                    Storage.save(true); // Skip pushing to history
+                    Render.indicators();
+                    Render.view();
+                } catch (e) {
+                    console.error("Undo/Redo Failed:", e);
+                }
+            },
+            init: () => {
+                History.stack = [];
+                History.ptr = -1;
+                History.push();
+            }
+        };
+
+        // --- SERVICES ---
+        const Storage = {
+            save: (skipHistory = false) => {
+                localStorage.setItem('debrief_data', JSON.stringify(AppState.mission));
+                if (!skipHistory) History.push();
+            },
+            load: () => {
+                const embedded = document.getElementById('dfp-data').textContent;
+                let d;
+                if (embedded && embedded.trim()) {
+                    d = embedded;
+                    console.log("Debrief Primer: Data loaded from embedded script.");
+                } else {
+                    d = localStorage.getItem('debrief_data');
+                }
+
+                if (d) {
+                    try {
+                        const loaded = JSON.parse(d);
+                        Storage.processLoadedData(loaded);
+                        setTimeout(() => History.init(), 100); // Init history after load
+                    } catch (e) {
+                        console.error("Failed to parse data:", e);
+                    }
+                } else {
+                    // Fallback init if no data
+                    setTimeout(() => History.init(), 100);
+                }
+            },
+            reset: () => { if (confirm("Reset all data?")) { localStorage.clear(); location.reload(); } },
+            exportJSON: () => {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(AppState.mission, null, 2));
+                const dlAnchor = document.createElement('a');
+                dlAnchor.setAttribute("href", dataStr);
+                dlAnchor.setAttribute("download", `debrief_${AppState.mission.meta.title || 'mission'}_${new Date().toISOString().slice(0, 10)}.json`);
+                document.body.appendChild(dlAnchor); dlAnchor.click(); dlAnchor.remove();
+            },
+            sendQwiEmail: () => {
+                const title = AppState.mission.meta.title || "Mission";
+                const date = AppState.mission.meta.date || "Unknown Date";
+                const mc = AppState.mission.roles.mc || "Unknown MC";
+
+                const subject = `[DEBRIEF] ${date} - ${title}`;
+                const body = `Bonjour,\n\nVeuillez trouver ci-joint le fichier de dÃ©briefing (.json) pour la mission suivante :\n\n- Date : ${date}\n- Mission : ${title}\n- MC : ${mc}\n\nCordialement.\n\n(Rappel : N'oubliez pas de joindre le fichier .json exportÃ©)`;
+
+                window.location.href = `mailto:ciet-qwi.contact.fct@intradef.gouv.fr?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            },
+            importJSON: (input) => {
+                const file = input.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const loaded = JSON.parse(e.target.result);
+                        Storage.processLoadedData(loaded);
+                        Storage.save(); // Save to local storage
+                        Render.indicators(); // Refresh UI
+                        Render.view();
+                        alert("Mission loaded successfully!");
+                    } catch (err) {
+                        alert("Error loading JSON: " + err.message);
+                    }
+                };
+                reader.readAsText(file);
+                input.value = ''; // Reset input
+            },
+            processLoadedData: (loaded) => {
+                AppState.mission = loaded;
+                // Migration for V2 Recon structure
+                if (!AppState.mission.recon.admin) {
+                    AppState.mission.recon = {
+                        admin: { equipment: false, fallout: false, products: false, atc: false, comms: false, notes: "" },
+                        objArea: "",
+                        forceInt: { intra: "", package: "" },
+                        dfpCandidates: AppState.mission.recon.dfpCandidates || {}
+                    };
+                }
+                // Migration for V3 Force Int (Split)
+                if (typeof AppState.mission.recon.forceInt === 'string') {
+                    AppState.mission.recon.forceInt = { intra: AppState.mission.recon.forceInt, package: "" };
+                }
+                // Migration for Leads
+                if (AppState.mission.analysis && AppState.mission.analysis.dfps) {
+                    AppState.mission.analysis.dfps.forEach(dfp => { if (dfp.lead === undefined) dfp.lead = ""; });
+                }
+                // Migration for Setup V2
+                if (!AppState.mission.meta.aircraftTypes) AppState.mission.meta.aircraftTypes = [];
+                if (!AppState.mission.meta.context) AppState.mission.meta.context = "non-COMAO";
+                if (!AppState.mission.meta.leadership) AppState.mission.meta.leadership = "isolated";
+            }
+        };
+
+        const Tooltip = {
+            init: () => {
+                const con = document.getElementById('tooltip-container');
+                const title = document.getElementById('tooltip-title');
+                const body = document.getElementById('tooltip-content');
+                document.body.addEventListener('mousemove', (e) => {
+                    const el = e.target.closest('.info-trigger');
+                    if (el) {
+                        const def = DEFINITIONS[el.dataset.key];
+                        if (def) {
+                            title.textContent = def.title; body.textContent = def.text; con.style.display = 'block';
+                            con.style.left = Math.min(e.clientX + 15, window.innerWidth - 320) + 'px';
+                            con.style.top = Math.min(e.clientY + 15, window.innerHeight - con.offsetHeight - 20) + 'px';
+                        }
+                    } else { con.style.display = 'none'; }
+                });
+            },
+            icon: (key) => `<span class="info-trigger" data-key="${key}">â“˜</span>`
+        };
+
+        // --- RENDERERS ---
+        const Render = {
+            init: () => { Render.indicators(); Render.view(); },
+            indicators: () => {
+                const el = document.getElementById('step-indicator');
+                el.innerHTML = PHASES.map((p, i) => {
+                    let cls = 'nav-tab';
+                    if (i === AppState.currentPhase) cls += ' active';
+                    else if (i < AppState.currentPhase) cls += ' completed';
+                    return `<div class="${cls}" onclick="AppState.currentPhase = ${i}; Render.init();">${p.label}</div>`;
+                }).join('');
+                document.getElementById('mission-status').textContent = AppState.mission.meta.title || "Untitled Mission";
+
+                // Update Nav Buttons
+                const prevBtn = document.getElementById('btn-prev');
+                const nextBtn = document.getElementById('btn-next');
+
+                if (AppState.currentPhase === 0) {
+                    prevBtn.style.visibility = 'hidden';
+                } else {
+                    prevBtn.style.visibility = 'visible';
+                }
+
+                if (AppState.currentPhase === PHASES.length - 1) {
+                    nextBtn.style.display = 'none'; // Hide next on last page
+                } else {
+                    nextBtn.style.display = 'flex';
+                    nextBtn.innerHTML = `Next: ${PHASES[AppState.currentPhase + 1].label.split('. ')[1]} <span>â†’</span>`;
+                }
+            },
+            view: () => {
+                const main = document.getElementById('app-main');
+                main.innerHTML = '';
+                const phaseId = PHASES[AppState.currentPhase].id;
+                if (phaseId === 'setup') Render.moduleSetup(main);
+                else if (phaseId === 'prep') Render.modulePrep(main);
+                else if (phaseId === 'execution') Render.moduleExecution(main);
+                else if (phaseId === 'reconstruction') Render.moduleReconstruction(main);
+                else if (phaseId === 'analysis') Render.moduleAnalysis(main);
+                else if (phaseId === 'presentation') Render.modulePresentation(main);
+
+                // Auto-resize all textareas after render
+                setTimeout(() => document.querySelectorAll('textarea').forEach(el => window.autoResize(el)), 0);
+            },
+
+            // --- MODULES ---
+            moduleSetup: (container) => {
+                container.innerHTML = `
+                    <h2 class="text-xl font-bold mb-4 text-white">1. Mission Setup</h2>
+                    <div class="card">
+                        <div class="section-title">Mission Overview</div>
+                        <div class="flex flex-col gap-md">
+                            <label><span class="text-sm font-bold">Mission Title</span><input type="text" class="w-full" value="${AppState.mission.meta.title}" onchange="update('meta.title', this.value)"></label>
+                            <label><span class="text-sm font-bold">Date</span><input type="date" class="w-full" value="${AppState.mission.meta.date}" onchange="update('meta.date', this.value)"></label>
+                            <label><span class="text-sm font-bold">Overview</span><textarea class="w-full" onchange="update('meta.overview', this.value)">${AppState.mission.meta.overview}</textarea></label>
+                        </div>
+                    </div>
+                    <div class="card"><div class="section-title">Key Personnel</div><div class="grid-2">
+                            <label><span class="text-sm font-bold">Mission Commander ${Tooltip.icon('MC')}</span><input class="w-full" value="${AppState.mission.roles.mc}" onchange="update('roles.mc', this.value)"></label>
+                            <label><span class="text-sm font-bold">Debrief Leader ${Tooltip.icon('DL')}</span><input class="w-full" value="${AppState.mission.roles.dl}" onchange="update('roles.dl', this.value)"></label>
+                            <label><span class="text-sm font-bold">Deputy DL ${Tooltip.icon('DDL')}</span><input class="w-full" value="${AppState.mission.roles.ddl}" onchange="update('roles.ddl', this.value)"></label>
+                            <label><span class="text-sm font-bold">Aircraft Cmdr ${Tooltip.icon('AC')}</span><input class="w-full" value="${AppState.mission.roles.ac}" onchange="update('roles.ac', this.value)"></label>
+                    </div></div>
+                    <div class="card">
+                        <div class="section-title">Tactical Context</div>
+                        <div class="grid-3">
+                            <div class="flex flex-col gap-sm">
+                                <span class="text-sm font-bold">Aircraft Types (Multi-select)</span>
+                                <div class="flex gap-xs flex-wrap">
+                                    ${['A400M', 'CN-235', 'C-130J'].map(type => `
+                                        <button class="tag-btn ${AppState.mission.meta.aircraftTypes.includes(type) ? 'selected' : ''}" 
+                                            onclick="toggleAircraftType('${type}')">${type}</button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-sm">
+                                <span class="text-sm font-bold">Mission Context</span>
+                                <div class="premium-toggle" style="width: fit-content;">
+                                    <button class="toggle-btn ${AppState.mission.meta.context === 'non-COMAO' ? 'active-lp' : ''}" 
+                                        onclick="update('meta.context', 'non-COMAO')">non-COMAO</button>
+                                    <button class="toggle-btn ${AppState.mission.meta.context === 'COMAO' ? 'active-dfp' : ''}" 
+                                        onclick="update('meta.context', 'COMAO')">COMAO</button>
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-sm">
+                                <span class="text-sm font-bold">Leadership Role</span>
+                                <div class="flex gap-xs flex-wrap">
+                                    ${['isolated', 'Element Lead', 'Package Lead', 'Mission Commander'].map(role => `
+                                        <button class="tag-btn ${AppState.mission.meta.leadership === role ? 'selected' : ''}" 
+                                            onclick="update('meta.leadership', '${role}')">${role}</button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+            },
+
+            modulePrep: (container) => {
+                const renderObjList = (title, type, iKey) => {
+                    const list = AppState.mission.prep[type] || [];
+                    return `<div class="mb-4"><div class="text-sm font-bold mb-2 flex items-center">${title} ${Tooltip.icon(iKey)}</div>
+                     ${list.map((itm, i) => `
+                        <div class="flex gap-sm mb-2 items-start">
+                            <div class="flex flex-col gap-xs">
+                                <button class="btn-icon text-xs" style="line-height:1; padding:0 4px; ${i === 0 ? 'opacity:0.2; pointer-events:none' : ''}" onclick="moveObj('${type}',${i},-1)">â–²</button>
+                                <button class="btn-icon text-xs" style="line-height:1; padding:0 4px; ${i === list.length - 1 ? 'opacity:0.2; pointer-events:none' : ''}" onclick="moveObj('${type}',${i},1)">â–¼</button>
+                            </div>
+                            <textarea class="w-full" rows="1" style="min-height:42px" onchange="updateObj('${type}',${i},this.value)">${itm.text}</textarea>
+                            <button class="btn-icon text-muted hover:text-red-500" onclick="removeObj('${type}',${i})">Ã—</button>
+                        </div>`).join('')}
+                     <button class="btn-premium-add" onclick="addObj('${type}')" style="padding: 0.4rem 0.8rem; font-size: 0.7rem;">
+                        <span class="plus-icon" style="width:14px; height:14px; font-size:10px">+</span> Add
+                     </button></div>`;
+                };
+                const renderDcp = () => {
+                    const list = AppState.mission.prep.dcp || [];
+                    return `<div class="section-title">Data Collection Plan ${Tooltip.icon('DCP')}</div><table class="w-full text-sm"><thead><tr><th>Item</th><th>Who</th><th>Method</th><th></th></tr></thead><tbody>
+                     ${list.map((r, i) => `
+                        <tr>
+                            <td class="p-2 align-top"><textarea class="w-full" rows="1" style="min-height:42px" onchange="updateDcp(${i},'item',this.value)">${r.item}</textarea></td>
+                            <td class="p-2 align-top"><textarea class="w-full" rows="1" style="min-height:42px" onchange="updateDcp(${i},'owner',this.value)">${r.owner}</textarea></td>
+                            <td class="p-2 align-top"><textarea class="w-full" rows="1" style="min-height:42px" onchange="updateDcp(${i},'method',this.value)">${r.method}</textarea></td>
+                            <td class="p-2 align-top">
+                                <div class="flex gap-sm items-center">
+                                    <div class="flex flex-col gap-xs">
+                                        <button class="btn-icon text-xs" style="line-height:1; padding:0 4px; ${i === 0 ? 'opacity:0.2; pointer-events:none' : ''}" onclick="moveDcp(${i},-1)">â–²</button>
+                                        <button class="btn-icon text-xs" style="line-height:1; padding:0 4px; ${i === list.length - 1 ? 'opacity:0.2; pointer-events:none' : ''}" onclick="moveDcp(${i},1)">â–¼</button>
+                                    </div>
+                                    <button class="btn-icon text-muted hover:text-red-500" onclick="removeDcp(${i})">Ã—</button>
+                                </div>
+                            </td>
+                        </tr>`).join('')}
+                     </tbody></table>
+                     <button class="btn-premium-add mt-2" onclick="addDcp()" style="padding: 0.4rem 0.8rem; font-size: 0.7rem;">
+                        <span class="plus-icon" style="width:14px; height:14px; font-size:10px">+</span> Add DCP
+                     </button>`;
+                };
+                container.innerHTML = `<h2 class="text-xl font-bold mb-4 text-white">2. Preparation</h2>
+                <div class="grid-2"><div class="card"><div class="section-title">Objectives</div><div class="grid-2">
+                <div class="flex-col">${renderObjList('Mission', 'missionObjs', 'MissionObjectives')}${renderObjList('Tactical', 'tacticalObjs', 'TacticalObjectives')}</div>
+                <div class="flex-col">${renderObjList('Performance', 'perfObjs', 'PerformanceObjectives')}${renderObjList('DLO', 'dlos', 'DLO')}</div></div></div>
+                <div class="card">${renderDcp()}</div></div>`;
+            },
+
+            moduleExecution: (container) => {
+                const sorted = AppState.mission.exec.events.slice().sort((a, b) => a.time.slice(11, 19).localeCompare(b.time.slice(11, 19)));
+                container.innerHTML = `<h2 class="text-xl font-bold mb-4 text-white">3. Execution</h2>
+                <div class="grid-2">
+                <div class="flex flex-col gap-md">
+                    <div class="card bg-gray-900 border border-gray-700">
+                        <div class="flex items-start gap-sm">
+                            <div class="text-accent text-xl">â„¹</div>
+                            <div class="text-sm text-muted">
+                                <span class="font-bold text-white">Execution Logging Phase</span><br>
+                                This tool is designed for use <b>during the mission</b> or immediately upon landing (e.g. at the step-desk).<br>
+                                Use it to rapidly log significant events, deviations, and timestamps <i>as they happen</i>. This creates the chronological "skeleton" that will facilitate the Reconstruction phase.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card" style="height:fit-content">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="section-title" style="margin-bottom:0">Logger</div>
+                            <input id="exec-time" type="text" placeholder="Time (HHMMSS)" class="text-sm p-1" style="width: 130px; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-main);" maxlength="8">
+                        </div>
+                        <textarea id="exec-input" class="w-full mb-2" rows="3" oninput="AppState.executionTemp.text=this.value">${AppState.executionTemp.text}</textarea>
+                        <button class="btn-premium-add w-full" onclick="logEvent()" style="justify-content: center; padding: 0.75rem;">
+                            <span class="plus-icon">âš¡</span> Log Event
+                        </button>
+                    </div>
+                </div>
+                <div class="card"><div class="section-title">Log</div><div>
+                ${sorted.map(ev => `
+                    <div class="timeline-item flex justify-between items-start">
+                        <div class="flex gap-md w-full items-center">
+                            <input class="timeline-time" style="background:transparent;border:none;width:80px;cursor:pointer" value="${ev.time.slice(11, 19)}" onchange="updateEventTime('${ev.id}', this.value)">
+                            <div class="timeline-content w-full flex items-center">
+                                <input class="w-full text-sm" style="background:transparent;border:none;color:inherit" value="${ev.text}" onchange="updateEvent('${ev.id}', this.value)">
+                            </div>
+                        </div>
+                        <button class="btn-icon text-muted hover:text-red-500 text-xs" style="opacity:0.5;margin-left:auto" title="Delete" onclick="removeEvent('${ev.id}')">Ã—</button>
+                    </div>`).join('')}
+                </div></div></div>`;
+            },
+
+            moduleReconstruction: (container) => {
+                const all = AppState.mission.exec.events.slice().sort((a, b) => a.time.slice(11, 19).localeCompare(b.time.slice(11, 19)));
+                const timeline = all.map(ev => {
+                    const isDfp = !!AppState.mission.recon.dfpCandidates[ev.id];
+                    const candType = AppState.mission.recon.dfpCandidates[ev.id];
+                    return `<div class="timeline-item ${isDfp ? 'dfp-candidate' : ''}"><div class="w-full">
+                <div class="flex justify-between items-center mb-1">
+                    <div class="flex items-center gap-sm">
+                        <input class="timeline-time" style="background:transparent;border:none;width:80px;cursor:pointer" value="${ev.time.slice(11, 19)}" onchange="updateEventTime('${ev.id}', this.value)">
+                    </div>
+                    <div class="flex gap-sm">
+                        <button class="tag-btn ${isDfp ? 'selected' : ''}" 
+                            style="${candType === 'LP' ? 'background:white; color:black; border-color:white' : ''}"
+                            onclick="toggleDfp('${ev.id}')">
+                            ${!isDfp ? 'â˜† Mark' : (candType === 'LP' ? 'â˜… LP' : 'â˜… DFP')}
+                        </button>
+                        <button class="btn-icon text-muted hover:text-red-500" title="Delete Event" onclick="removeEvent('${ev.id}')">Ã—</button>
+                    </div>
+                </div>
+                <input class="w-full" style="border:none;background:transparent" value="${ev.text}" onchange="updateEvent('${ev.id}',this.value)">
+            </div></div>`;
+                }).join('');
+
+                container.innerHTML = `<h2 class="text-xl font-bold mb-4 text-white">4. Reconstruction</h2>
+                <div class="flex flex-col gap-4" style="min-height:100%">
+                    <!-- TOP ROW: 1, 2, 3 -->
+                    <div class="grid-3 gap-4">
+                        <!-- 1. ADMIN -->
+                        <div class="card">
+                            <div class="section-title">1. Admin ${Tooltip.icon('ADMIN')}</div>
+                            <div class="flex flex-col gap-sm text-sm mb-2">
+                                ${['Equipment', 'Fallout', 'Products', 'ATC', 'Comms'].map(k => `
+                                    <label class="flex items-center gap-sm cursor-pointer">
+                                        <input type="checkbox" ${AppState.mission.recon.admin[k] ? 'checked' : ''} onchange="update('recon.admin.${k}',this.checked)">
+                                        <span class="capitalize">${k} Issue?</span>
+                                    </label>`).join('')}
+                            </div>
+                            <textarea class="w-full text-sm" rows="3" placeholder="Notes on Admin impact..." onchange="update('recon.admin.notes',this.value)">${AppState.mission.recon.admin.notes}</textarea>
+                        </div>
+
+                        <!-- 2. OBJ AREA -->
+                        <div class="card">
+                            <div class="section-title">2. Obj Area Analysis ${Tooltip.icon('OBJ_AREA')}</div>
+                            <textarea class="w-full text-sm h-full" style="min-height:150px" placeholder="Expected vs Actual conditions...\nImpact on mission?" onchange="update('recon.objArea',this.value)">${AppState.mission.recon.objArea}</textarea>
+                        </div>
+
+                        <!-- 3. FORCE INTEGRATION -->
+                        <div class="card">
+                            <div class="section-title">3. Force Integration ${Tooltip.icon('FORCE_INT')}</div>
+                            <div class="flex flex-col gap-sm h-full">
+                                <div class="flex-1 flex flex-col">
+                                    <label class="text-xs font-bold text-muted">Intra-Formation</label>
+                                    <textarea class="w-full text-sm flex-1" style="min-height:60px" placeholder="Contracts, Deconfliction, Mutual support..." onchange="update('recon.forceInt.intra',this.value)">${AppState.mission.recon.forceInt.intra}</textarea>
+                                </div>
+                                <div class="flex-1 flex flex-col">
+                                    <label class="text-xs font-bold text-muted">Package / External</label>
+                                    <textarea class="w-full text-sm flex-1" style="min-height:60px" placeholder="Contracts, Deconfliction, timing with other assets..." onchange="update('recon.forceInt.package',this.value)">${AppState.mission.recon.forceInt.package}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BOTTOM ROW: 4. PLAYBACK -->
+                    <div class="card flex-1 flex flex-col overflow-hidden" style="min-height: 50vh;">
+                        <div class="section-title flex justify-between items-center">
+                            <span>4. High-Speed Playback</span>
+                            <button class="btn-premium-add" onclick="addReconEvent()">
+                                <span class="plus-icon">+</span> Add Event
+                            </button>
+                        </div>
+                        <div class="mb-2 p-2 bg-gray-900 rounded border border-gray-700 flex flex-col gap-1">
+                            <div class="text-xs font-bold text-muted uppercase border-b border-gray-700 pb-1 mb-1">Objectives Reminder</div>
+                            ${(AppState.mission.prep.missionObjs || []).length > 0 ? `<div class="text-xs mb-1"><span class="font-bold text-accent">MISSION:</span> <div class="text-white mt-0.5">${AppState.mission.prep.missionObjs.map(o => `<div style="margin-left:8px; margin-bottom:2px">â€¢ ${o.text}</div>`).join('')}</div></div>` : ''}
+                            ${(AppState.mission.prep.tacticalObjs || []).length > 0 ? `<div class="text-xs mb-1"><span class="font-bold text-accent">TACTICAL:</span> <div class="text-white mt-0.5">${AppState.mission.prep.tacticalObjs.map(o => `<div style="margin-left:8px; margin-bottom:2px">â€¢ ${o.text}</div>`).join('')}</div></div>` : ''}
+                            ${(AppState.mission.prep.perfObjs || []).length > 0 ? `<div class="text-xs mb-1"><span class="font-bold text-accent">PERF:</span> <div class="text-white mt-0.5">${AppState.mission.prep.perfObjs.map(o => `<div style="margin-left:8px; margin-bottom:2px">â€¢ ${o.text}</div>`).join('')}</div></div>` : ''}
+                            ${(AppState.mission.prep.dlos || []).length > 0 ? `<div class="text-xs mb-1"><span class="font-bold text-accent">DLO:</span> <div class="text-white mt-0.5">${AppState.mission.prep.dlos.map(o => `<div style="margin-left:8px; margin-bottom:2px">â€¢ ${o.text}</div>`).join('')}</div></div>` : ''}
+                            ${(!AppState.mission.prep.missionObjs?.length && !AppState.mission.prep.tacticalObjs?.length && !AppState.mission.prep.perfObjs?.length && !AppState.mission.prep.dlos?.length) ? `<div class="text-xs text-muted italic">No Objectives defined.</div>` : ''}
+                        </div>
+                        <div class="flex-1 overflow-y-auto pr-2 bg-black/20 rounded p-2">
+                            ${timeline || '<div class="text-center text-muted mt-8">No events logged. Start reconstruction...</div>'}
+                        </div>
+                    </div>
+                </div>`;
+            },
+
+            moduleAnalysis: (container) => {
+                // Ensure DFPs exist
+                Object.keys(AppState.mission.recon.dfpCandidates).forEach(candId => {
+                    if (!AppState.mission.analysis.dfps.find(d => d.linkedEventId === candId)) {
+                        const ev = AppState.mission.exec.events.find(e => e.id === candId);
+                        AppState.mission.analysis.dfps.push({
+                            id: 'dfp_' + Date.now() + Math.random().toString().slice(2, 5), linkedEventId: candId,
+                            id: 'dfp_' + Date.now() + Math.random().toString().slice(2, 5), linkedEventId: candId,
+                            type: AppState.mission.recon.dfpCandidates[candId] === 'LP' ? 'LP' : 'DFP',
+                            question: ev ? `Why did ${ev.text}?` : "Why...?",
+                            cfs: [], rcIndex: null, primaryIF: { issue: "", ref: "", analysis: "", conclusion: "", verification: "" }, l2: "", lead: ""
+                        });
+                    }
+                });
+                let dfpCount = 0;
+                let lpCount = 0;
+                const dfps = AppState.mission.analysis.dfps.slice().sort((a, b) => {
+                    const typeA = a.type || 'DFP';
+                    const typeB = b.type || 'DFP';
+                    if (typeA === typeB) return 0; // Maintain insertion order for same type
+                    return typeA === 'DFP' ? -1 : 1; // DFP first, then LP
+                }).map(d => {
+                    const type = d.type || 'DFP';
+                    const idx = type === 'DFP' ? ++dfpCount : ++lpCount;
+                    return { ...d, _displayIdx: idx };
+                });
+                const active = AppState.activeDfpId ? dfps.find(d => d.id === AppState.activeDfpId) : dfps[0];
+                if (active && !AppState.activeDfpId) AppState.activeDfpId = active.id;
+
+                const cfsHtml = active ? active.cfs.map((cf, i) => `
+                    <div class="cf-item ${active.rcIndex === i ? 'rc' : ''}">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[10px] font-bold text-muted uppercase tracking-wider" style="color: ${active.rcIndex === i ? 'var(--accent-secondary)' : ''}">${active.rcIndex === i ? 'ROOT CAUSE (RC)' : `Contributing Factor #${i + 1}`}</span>
+                            <div class="flex gap-sm">
+                                <label class="text-xs flex items-center gap-xs cursor-pointer hover:text-white" title="Select as Root Cause">
+                                    <input type="radio" name="rc_grp_${active.id}" ${active.rcIndex === i ? 'checked' : ''} onclick="updateCfRc(${i})"> 
+                                    ${active.rcIndex === i ? 'Selected RC' : 'Select as RC'}
+                                </label>
+                                <button class="btn-icon text-xs hover:text-red-500" onclick="removeCf(${i})">Ã—</button>
+                            </div>
+                        </div>
+                        <textarea class="w-full font-bold mb-1" rows="1" placeholder="Describe Factor..." oninput="autoResize(this)" onchange="updateCf(${i},'factor',this.value)">${cf.factor}</textarea>
+                        
+                        ${/* Mini-IF Section - Only for Non-RC */ ''}
+                        ${active.rcIndex === i ? `
+                            <div class="mt-2 pl-4 border-l-2 border-accent-secondary">
+                                <div class="section-title text-sm" style="color:var(--accent-secondary)">Instructional Fix (IF)</div>
+                                <textarea class="w-full text-sm font-bold bg-gray-900 border border-gray-700 p-2 rounded" rows="3" placeholder="Next time I will..." oninput="autoResize(this)" onchange="updateIF('conclusion',this.value)">${active.primaryIF.conclusion}</textarea>
+                            </div>
+                        ` : `
+                            ${cf.miniIf !== undefined ? `
+                                <div class="mt-1 pl-4 border-l-2 border-gray-700">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-[10px] text-muted uppercase tracking-wider">Mini-IF</span>
+                                        <button class="btn-icon text-xs hover:text-red-500" title="Remove Mini-IF" onclick="updateCf(${i},'miniIf',undefined)">Ã—</button>
+                                    </div>
+                                    <textarea class="w-full text-sm bg-gray-800 p-1 rounded" rows="1" placeholder="Next time I will..." oninput="autoResize(this)" onchange="updateCf(${i},'miniIf',this.value)">${cf.miniIf}</textarea>
+                                </div>
+                            ` : `
+                                <div class="mt-1 pl-4">
+                                    <button class="btn btn-secondary text-xs" onclick="updateCf(${i},'miniIf','')">
+                                        <span>+</span> Add Mini-IF
+                                    </button>
+                                </div>
+                            `}
+                        `}
+                    </div>`).join('') : '';
+
+                const rcText = active && active.rcIndex !== null && active.cfs[active.rcIndex] ? active.cfs[active.rcIndex].factor : null;
+
+                container.innerHTML = `<div class="flex flex-col h-full">
+                    <h2 class="text-xl font-bold mb-4 text-white">5. Analysis</h2>
+                    <div style="display:grid;grid-template-columns:250px 1fr 250px;gap:1rem;flex:1;min-height:0">
+            <div class="overflow-y-auto">${dfps.map(d => `
+
+            <div class="dfp-chip group relative ${d.id === AppState.activeDfpId ? 'active' : ''}" 
+                onclick="selectDfp('${d.id}')"
+                draggable="true" 
+                ondragstart="drag(event, '${d.id}')" 
+                ondragover="allowDrop(event)" 
+                ondragleave="dragLeave(event)"
+                ondrop="drop(event, '${d.id}')">
+                <div class="dfp-indicator ${d.type === 'LP' ? 'type-lp' : 'type-dfp'}">
+                    ${d.type === 'LP' ? 'LP' : 'DFP'} ${d._displayIdx}
+                </div>
+                <div class="dfp-content">
+                    <span class="text-sm font-bold" style="word-break:break-word; margin-right:8px; line-height:1.2">
+                        ${d.question}
+                    </span>
+                    <span class="text-xs whitespace-nowrap opacity-70">${d.cfs.length} CFs</span>
+                </div>
+                <button class="absolute top-1 right-1 p-1 text-muted hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" 
+                    title="Delete" onclick="removeDfp(event, '${d.id}')">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>`).join('')}
+            <button class="btn-premium-add w-full mt-2" onclick="addManualDfp()" style="justify-content: center; background: linear-gradient(135deg, #334155, #1e293b); border: 1px dashed rgba(255,255,255,0.2); box-shadow: none;">
+                <span class="plus-icon">+</span> Add Manual DFP
+            </button>
+            </div>
+            
+            <div id="analysis-center-scroll" class="overflow-y-auto">${active ? `
+            <div class="card">
+                <div class="flex justify-between items-center mb-3 pb-2 border-b border-gray-800" style="border-color: #334155;">
+                    <div class="section-title mb-0 border-none pb-0" style="border:none; margin:0; color:var(--accent-primary)">
+                        ${active.type === 'LP' ? 'Learning Point' : 'Debrief Focus Point'} #${active._displayIdx}
+                    </div>
+                    <!-- Premium Toggle CSS -->
+                    <div class="premium-toggle">
+                        <button class="toggle-btn ${(!active.type || active.type === 'DFP') ? 'active-dfp' : ''}" 
+                            onclick="updateDfp('type','DFP')">DFP</button>
+                        <button class="toggle-btn ${active.type === 'LP' ? 'active-lp' : ''}" 
+                            onclick="updateDfp('type','LP')">LP</button>
+                    </div>
+                </div>
+                <div class="flex gap-md mb-4 items-start">
+                    <div style="flex: 4; min-width: 0;">
+                        <label class="text-xs font-bold text-muted">${active.type === 'LP' ? 'LP Topic / Question' : 'Debrief Focus Point (Question)'}</label>
+                        <textarea class="w-full text-lg font-bold bg-gray-800 p-2 rounded border border-gray-700" rows="2" 
+                            placeholder="${active.type === 'LP' ? 'What is the learning point?' : 'Why did...?'}"
+                            oninput="autoResize(this)" onchange="updateDfp('question',this.value)">${active.question}</textarea>
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                        <label class="text-xs font-bold text-muted">Lead / Owner</label>
+                        <textarea class="w-full text-sm bg-gray-800 p-2 rounded border border-gray-700" rows="2" 
+                            placeholder="Name" 
+                            oninput="autoResize(this)" onchange="updateDfp('lead',this.value)">${active.lead || ''}</textarea>
+                    </div>
+                </div>
+                            
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-bold">Contributing Factors (CFs)</span>
+                                <button class="btn-premium-add" onclick="addCf()" style="padding: 0.4rem 0.8rem; font-size: 0.7rem;">
+                                    <span class="plus-icon" style="width:14px; height:14px; font-size:10px">+</span> Add CF
+                                </button>
+                            </div>
+                            <div class="mb-6">${cfsHtml}</div>
+                            
+
+                            
+                            <div>
+                                <div class="section-title text-sm flex justify-between items-center">
+                                    <span>Lesson Learned (L2) Summary</span>
+                                    <div class="flex items-center gap-2">
+                                        <button class="btn btn-secondary text-xs p-1" onclick="copyL2Prompt()" title="Copy AI Prompt for L2 Generation">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                            </svg>
+                                        </button>
+                                        ${Tooltip.icon('AI_PROMPT')}
+                                    </div>
+                                </div>
+                                <div class="text-xs text-muted mb-2">The "One Thing" to take away. How to prevent this RC in the future (Generalizable).</div>
+                                <textarea class="w-full text-sm font-bold" rows="3" placeholder="e.g. Always verify [X] before committing to [Y]..." onchange="updateDfp('l2',this.value)">${active.l2}</textarea>
+                            </div>
+                        </div>` : '<div class="card">No DFP Selected</div>'}
+                    </div>
+                    
+                    <div class="overflow-y-auto">
+                        <div class="card" style="border-left:4px solid var(--accent-primary)">
+                            <div class="section-title text-sm">IPO+S Helper ${Tooltip.icon('IPO')}</div>
+                            <div class="text-xs text-muted mb-2">Diagnostic questions to find the Root Cause (RC). Ask yourself:</div>
+                            
+                            <details class="mb-2">
+                                <summary class="cursor-pointer font-bold text-sm bg-gray-800 p-2 rounded hover:bg-gray-700">1. Input (Perception)</summary>
+                                <div class="p-2 text-xs text-muted bg-gray-900 rounded mt-1">
+                                    <ul style="list-style-position: inside; list-style-type: disc;">
+                                        <li>Did I see/hear necessary info?</li>
+                                        <li>Was the display/audio clear?</li>
+                                        <li>Did I focus on the right thing?</li>
+                                        <li><b>Common errors:</b> Fixation, Distraction, Poor Scan.</li>
+                                    </ul>
+                                </div>
+                            </details>
+
+                            <details class="mb-2">
+                                <summary class="cursor-pointer font-bold text-sm bg-gray-800 p-2 rounded hover:bg-gray-700">2. Process (Decision)</summary>
+                                <div class="p-2 text-xs text-muted bg-gray-900 rounded mt-1">
+                                    <ul style="list-style-position: inside; list-style-type: disc;">
+                                        <li>Did I understand what I saw?</li>
+                                        <li>Did I know the correct procedure/rule?</li>
+                                        <li>Did I make a conscious choice?</li>
+                                        <li><b>Common errors:</b> Knowledge gap, Bad Logic, Risk miscalculation.</li>
+                                    </ul>
+                                </div>
+                            </details>
+
+                            <details class="mb-2">
+                                <summary class="cursor-pointer font-bold text-sm bg-gray-800 p-2 rounded hover:bg-gray-700">3. Output (Execution)</summary>
+                                <div class="p-2 text-xs text-muted bg-gray-900 rounded mt-1">
+                                    <ul style="list-style-position: inside; list-style-type: disc;">
+                                        <li>Did I try to do the right thing?</li>
+                                        <li>Did my hands/feet do what I wanted?</li>
+                                        <li>Was it a mechanical skill issue?</li>
+                                        <li><b>Common errors:</b> Switchology, Timing, Motor skills (Stick & Rudder).</li>
+                                    </ul>
+                                </div>
+                            </details>
+
+                            <details class="mb-2">
+                                <summary class="cursor-pointer font-bold text-sm bg-gray-800 p-2 rounded hover:bg-gray-700">4. Storage (Products)</summary>
+                                <div class="p-2 text-xs text-muted bg-gray-900 rounded mt-1">
+                                    <ul style="list-style-position: inside; list-style-type: disc;">
+                                        <li>Was the mission data correct?</li>
+                                        <li>Were my charts/cards accurate?</li>
+                                        <li>Did the aircraft system have the right load?</li>
+                                        <li><b>Common errors:</b> Setup error, Bad Intel, Outdated publications.</li>
+                                    </ul>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                </div>`;
+            },
+
+            modulePresentation: (container) => {
+                const m = AppState.mission;
+                const sortedEvents = [...m.exec.events].sort((a, b) => a.time.slice(11, 19).localeCompare(b.time.slice(11, 19)));
+
+                // Separate DFPs and LPs
+                const dfpItems = m.analysis.dfps.filter(d => (d.type || 'DFP') === 'DFP');
+                const lpItems = m.analysis.dfps.filter(d => d.type === 'LP');
+
+                const renderAnalysisCard = (d, isDfp, index) => {
+                    const rcIndex = d.rcIndex !== null ? d.rcIndex : -1;
+                    const accentColor = isDfp ? 'var(--accent-primary)' : 'rgba(255,255,255,0.5)';
+                    const typeLabel = (isDfp ? 'DFP #' : 'LP #') + index;
+                    const typeBadgeStyle = isDfp ? 'background:var(--accent-primary);color:white' : 'background:white;color:black';
+
+                    return `<div class="card" style="border-left:4px solid ${accentColor}; margin-bottom:1.5rem; padding:1.5rem;">
+                        <!-- Header -->
+                        <div style="margin-bottom:1.5rem;">
+                            <div style="display:flex; align-items:center; gap:12px; margin-bottom:0.75rem;">
+                                <span style="padding:4px 12px;border-radius:4px;font-size:14px;font-weight:bold;${typeBadgeStyle}">${typeLabel}</span>
+                                ${d.lead ? `<span class="text-xs text-muted">Lead: <b>${d.lead}</b></span>` : ''}
+                            </div>
+                            <div class="text-xl font-bold" style="line-height:1.4">${d.question}</div>
+                        </div>
+                        
+                        <!-- Contributing Factors -->
+                        ${d.cfs.length > 0 ? `
+                        <div style="margin-bottom:1.5rem; padding:1rem; background:rgba(255,255,255,0.02); border-radius:8px;">
+                            <div class="text-xs font-bold text-muted uppercase" style="margin-bottom:1rem; letter-spacing:0.5px">Contributing Factors</div>
+                            ${d.cfs.map((cf, i) => {
+                        const isRc = rcIndex === i;
+                        return `
+                                <div style="margin-bottom:1rem; padding-left:1rem; border-left:3px solid ${isRc ? 'var(--accent-secondary)' : '#334155'}">
+                                    <div class="text-xs font-bold text-muted uppercase" style="margin-bottom:0.25rem; letter-spacing:0.5px">
+                                        CF #${i + 1}
+                                        ${isRc ? '<span style="color:var(--accent-secondary); margin-left:0.5rem">â¬¤ ROOT CAUSE</span>' : ''}
+                                    </div>
+                                    <div class="text-sm ${isRc ? 'font-bold' : ''}">${cf.factor}</div>
+                                    
+                                    ${/* Mini-IF for non-RC */ ''}
+                                    ${!isRc && cf.miniIf ? `
+                                        <div class="text-sm italic" style="margin-top:0.25rem; color:#94a3b8; font-weight:500;">
+                                            <span style="opacity:0.7">Fix:</span> ${cf.miniIf}
+                                        </div>` : ''}
+
+                                    ${/* Main IF for RC - MOVED HERE */ ''}
+                                    ${isRc && d.primaryIF.conclusion ? `
+                                        <div style="margin-top:0.5rem; padding:0.75rem; background:rgba(59,130,246,0.08); border-left:2px solid var(--accent-secondary); border-radius:4px;">
+                                            <div class="text-xs font-bold uppercase" style="color:var(--accent-secondary); letter-spacing:0.5px; margin-bottom:0.25rem">Instructional Fix</div>
+                                            <div class="text-sm font-bold" style="line-height:1.4">${d.primaryIF.conclusion}</div>
+                                        </div>` : ''}
+                                </div>`;
+                    }).join('')}
+                        </div>
+                        ` : ''}
+                        
+                        <!-- Lesson Learned -->
+                        ${d.l2 ? `
+                        <div style="padding:1rem; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.2); border-radius:8px;">
+                            <div class="text-xs font-bold uppercase" style="color:#10B981; letter-spacing:0.5px; margin-bottom:0.75rem">Lesson Learned (L2)</div>
+                            <div class="text-sm italic" style="line-height:1.5">${d.l2}</div>
+                        </div>
+                        ` : ''}
+                    </div>`;
+                };
+
+                // Check if recon has any content
+                const hasReconContent = m.recon.admin.notes || m.recon.objArea || m.recon.forceInt.intra || m.recon.forceInt.package ||
+                    Object.entries(m.recon.admin).some(([k, v]) => k !== 'notes' && v === true);
+
+                const adminIssues = ['Equipment', 'Fallout', 'Products', 'ATC', 'Comms'].filter(k => m.recon.admin[k]);
+
+                container.innerHTML = `
+                    <h2 class="text-xl font-bold mb-6 text-white no-print">6. Final Output</h2>
+                    
+                    <!-- â•â•â•â•â•â• HEADER â•â•â•â•â•â• -->
+                    <div class="card" style="border-left:4px solid var(--accent-primary); margin-bottom:2.5rem; padding:1.5rem;">
+                        <div class="text-xs font-bold text-muted uppercase tracking-widest mb-3">Debrief Report</div>
+                        <h1 class="text-3xl font-bold mb-2" style="color:var(--accent-primary)">${m.meta.title || 'Untitled Mission'}</h1>
+                        <div class="text-muted mb-4" style="font-size:15px">${m.meta.date || 'No date'}</div>
+                        
+                        <div style="display:flex; gap:2rem; margin-bottom:1.5rem; flex-wrap: wrap;">
+                            <div class="text-sm"><span class="text-muted">Mission Commander:</span> <b>${m.roles.mc || '-'}</b></div>
+                            <div class="text-sm"><span class="text-muted">Debrief Lead:</span> <b>${m.roles.dl || '-'}</b></div>
+                            <div class="text-sm"><span class="text-muted">Aircraft:</span> <b>${m.meta.aircraftTypes?.join(', ') || '-'}</b></div>
+                            <div class="text-sm"><span class="text-muted">Context:</span> <b>${m.meta.context || '-'}</b></div>
+                            <div class="text-sm"><span class="text-muted">Role:</span> <b>${m.meta.leadership || '-'}</b></div>
+                        </div>
+                        
+                        ${m.meta.overview ? `
+                        <div style="padding:1rem; background:rgba(255,255,255,0.03); border-radius:8px;">
+                            <div class="text-xs font-bold text-muted uppercase mb-2">Mission Overview</div>
+                            <div class="text-sm" style="line-height:1.7">${m.meta.overview}</div>
+                        </div>` : ''}
+                    </div>
+
+                    <!-- â•â•â•â•â•â• OBJECTIVES â•â•â•â•â•â• -->
+                    <div class="card" style="margin-bottom:2.5rem; padding:1.5rem;">
+                        <div class="section-title" style="font-size:1.2rem; margin-bottom:1.5rem;">Objectives</div>
+                        
+                        ${m.prep.missionObjs.length > 0 ? `
+                        <div style="margin-bottom:1.5rem;">
+                            <div class="text-xs font-bold text-muted uppercase mb-3">Mission Objectives</div>
+                            ${m.prep.missionObjs.map(o => `<div class="text-sm" style="margin-bottom:0.75rem; padding-left:1rem; border-left:3px solid var(--accent-primary)">${o.text}</div>`).join('')}
+                        </div>` : ''}
+                        
+                        ${m.prep.tacticalObjs.length > 0 ? `
+                        <div style="margin-bottom:1.5rem;">
+                            <div class="text-xs font-bold text-muted uppercase mb-3">Tactical Objectives</div>
+                            ${m.prep.tacticalObjs.map(o => `<div class="text-sm" style="margin-bottom:0.75rem; padding-left:1rem; border-left:3px solid #60a5fa">${o.text}</div>`).join('')}
+                        </div>` : ''}
+                        
+                        ${m.prep.perfObjs.length > 0 ? `
+                        <div style="margin-bottom:1.5rem;">
+                            <div class="text-xs font-bold text-muted uppercase mb-3">Performance Objectives</div>
+                            ${m.prep.perfObjs.map(o => `<div class="text-sm" style="margin-bottom:0.75rem; padding-left:1rem; border-left:3px solid #a78bfa">${o.text}</div>`).join('')}
+                        </div>` : ''}
+                        
+                        ${m.prep.dlos.length > 0 ? `
+                        <div style="margin-bottom:0;">
+                            <div class="text-xs font-bold text-muted uppercase mb-3">Desired Learning Objectives</div>
+                            ${m.prep.dlos.map(o => `<div class="text-sm" style="margin-bottom:0.75rem; padding-left:1rem; border-left:3px solid #f59e0b">${o.text}</div>`).join('')}
+                        </div>` : ''}
+                        
+                        ${m.prep.missionObjs.length === 0 && m.prep.tacticalObjs.length === 0 && m.prep.perfObjs.length === 0 && m.prep.dlos.length === 0 ? '<div class="text-muted text-sm italic">No objectives defined</div>' : ''}
+                    </div>
+
+                    <!-- RECON SUMMARY -->
+                    ${hasReconContent ? `
+                    <div class="card mb-4">
+                        <div class="section-title">Reconstruction Summary</div>
+                        <div class="grid-3 gap-4">
+                            <div>
+                                <div class="text-xs font-bold text-muted uppercase mb-1">Admin</div>
+                                ${adminIssues.length > 0 ? `<div class="text-sm text-yellow-400 mb-1">Issues: ${adminIssues.join(', ')}</div>` : ''}
+                                <div class="text-sm">${m.recon.admin.notes || '<span class="text-muted italic">No notes</span>'}</div>
+                            </div>
+                            <div>
+                                <div class="text-xs font-bold text-muted uppercase mb-1">Objective Area</div>
+                                <div class="text-sm">${m.recon.objArea || '<span class="text-muted italic">No notes</span>'}</div>
+                            </div>
+                            <div>
+                                <div class="text-xs font-bold text-muted uppercase mb-1">Force Integration</div>
+                                ${m.recon.forceInt.intra ? `<div class="text-sm mb-1"><b>Intra:</b> ${m.recon.forceInt.intra}</div>` : ''}
+                                ${m.recon.forceInt.package ? `<div class="text-sm"><b>Package:</b> ${m.recon.forceInt.package}</div>` : ''}
+                                ${!m.recon.forceInt.intra && !m.recon.forceInt.package ? '<span class="text-muted italic text-sm">No notes</span>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <!-- â•â•â•â•â•â• TIMELINE â•â•â•â•â•â• -->
+                    ${sortedEvents.length > 0 ? `
+                    <div class="card" style="margin-bottom:2.5rem; padding:1.5rem;">
+                        <div class="section-title" style="font-size:1.2rem; margin-bottom:1.5rem;">Event Timeline</div>
+                        <div style="display:flex; flex-direction:column; gap:0.5rem;">
+                            ${sortedEvents.map(ev => {
+                    const isDfpCandidate = !!m.recon.dfpCandidates[ev.id];
+                    const candType = m.recon.dfpCandidates[ev.id];
+                    const borderColor = isDfpCandidate ? (candType === 'LP' ? 'rgba(255,255,255,0.5)' : 'var(--accent-primary)') : '#334155';
+                    const bgColor = isDfpCandidate ? (candType === 'LP' ? 'rgba(255,255,255,0.08)' : 'rgba(59,130,246,0.1)') : 'transparent';
+                    return `<div style="display:flex; align-items:flex-start; gap:1rem; padding:0.6rem 0.75rem; border-left:3px solid ${borderColor}; background:${bgColor}; border-radius:0 6px 6px 0;">
+                                    <span class="font-mono text-xs text-muted" style="min-width:55px;">${ev.time.slice(11, 19)}</span>
+                                    <span class="text-sm" style="flex:1;">${ev.text}</span>
+                                    ${isDfpCandidate ? `<span class="text-xs font-bold" style="color:${candType === 'LP' ? 'white' : 'var(--accent-primary)'}">â˜… ${candType}</span>` : ''}
+                                </div>`;
+                }).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <!-- â•â•â•â•â•â• DFPs â•â•â•â•â•â• -->
+                    ${dfpItems.length > 0 ? `
+                    <div style="margin-bottom:2.5rem; page-break-before: always; break-before: page;">
+                        <div style="font-size:1.2rem; font-weight:bold; color:var(--accent-primary); border-bottom:2px solid var(--accent-primary); padding-bottom:0.75rem; margin-bottom:1.5rem;">Debrief Focus Points (${dfpItems.length})</div>
+                        ${dfpItems.map((d, i) => renderAnalysisCard(d, true, i + 1)).join('')}
+                    </div>
+                    ` : ''}
+
+                    <!-- â•â•â•â•â•â• LPs â•â•â•â•â•â• -->
+                    ${lpItems.length > 0 ? `
+                    <div style="margin-bottom:2.5rem; page-break-before: always; break-before: page;">
+                        <div style="font-size:1.2rem; font-weight:bold; color:var(--accent-primary); border-bottom:2px solid var(--accent-primary); padding-bottom:0.75rem; margin-bottom:1.5rem;">Learning Points (${lpItems.length})</div>
+                        ${lpItems.map((d, i) => renderAnalysisCard(d, false, i + 1)).join('')}
+                    </div>
+                    ` : ''}
+
+                    <!-- â•â•â•â•â•â• FINAL SUMMARY â•â•â•â•â•â• -->
+                    <div class="card print-summary" style="border-left:4px solid #10B981; margin-bottom:2.5rem; padding:1.5rem;">
+                        <div class="section-title" style="font-size:1.2rem; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center;">
+                            <span>Final Summary & Trends</span>
+                            <div class="flex items-center gap-2 no-print">
+                                <button id="btn-copy-summary-prompt" class="btn btn-secondary text-xs p-1" onclick="copyFinalSummaryPrompt()" title="Copy AI Prompt">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                    </svg>
+                                </button>
+                                ${Tooltip.icon('AI_SUMMARY_PROMPT')}
+                            </div>
+                        </div>
+                        <div class="text-xs text-muted" style="margin-bottom:1rem;">Key takeaways, recurring patterns, and areas for future focus.</div>
+                        <textarea class="w-full no-print" rows="6" style="font-size:14px; line-height:1.7;" placeholder="Enter final thoughts, key takeaways, and recurring trends..." onchange="update('output.summary',this.value)">${m.output.summary || ''}</textarea>
+                        <div class="hidden-on-screen show-on-print" style="white-space: pre-wrap;">${m.output.summary || ''}</div>
+                    </div>
+
+                    <!-- PRINT BUTTON -->
+                    <div class="text-center" style="margin-top:3rem; margin-bottom:2rem;" class="no-print">
+                        <button class="btn btn-primary" style="padding:14px 40px; font-size:16px;" onclick="window.print()">ðŸ–¨ï¸ Print to PDF</button>
+                    </div>
+                `;
+            }
+        };
+
+        // --- GLOBAL ACTIONS ---
+        window.toggleAircraftType = (type) => {
+            const arr = AppState.mission.meta.aircraftTypes || [];
+            const idx = arr.indexOf(type);
+            if (idx === -1) arr.push(type);
+            else arr.splice(idx, 1);
+            AppState.mission.meta.aircraftTypes = arr;
+            Render.indicators(); Render.view(); Storage.save();
+        };
+
+        window.update = (path, val) => { const parts = path.split('.'); let target = AppState.mission; for (let i = 0; i < parts.length - 1; i++) target = target[parts[i]]; target[parts[parts.length - 1]] = val; Render.indicators(); Render.view(); Storage.save(); };
+        window.addObj = (type) => { AppState.mission.prep[type].push({ id: Date.now(), text: "" }); Render.view(); Storage.save(); };
+        window.updateObj = (type, idx, val) => { AppState.mission.prep[type][idx].text = val; Storage.save(); };
+        window.removeObj = (type, idx) => { AppState.mission.prep[type].splice(idx, 1); Render.view(); Storage.save(); };
+        window.addDcp = () => { AppState.mission.prep.dcp.push({ id: Date.now(), item: "", owner: "", method: "" }); Render.view(); Storage.save(); };
+        window.updateDcp = (idx, f, v) => { AppState.mission.prep.dcp[idx][f] = v; Storage.save(); };
+        window.removeDcp = (idx) => { AppState.mission.prep.dcp.splice(idx, 1); Render.view(); Storage.save(); };
+        window.moveObj = (type, idx, dir) => {
+            const arr = AppState.mission.prep[type];
+            if (!arr || idx + dir < 0 || idx + dir >= arr.length) return;
+            [arr[idx], arr[idx + dir]] = [arr[idx + dir], arr[idx]];
+            Render.view(); Storage.save();
+        };
+
+        window.prevPage = () => {
+            if (AppState.currentPhase > 0) {
+                AppState.currentPhase--;
+                Render.indicators(); Render.view();
+            }
+        };
+        window.nextPage = () => {
+            if (AppState.currentPhase < PHASES.length - 1) {
+                AppState.currentPhase++;
+                Render.indicators(); Render.view();
+            }
+        };
+
+        window.logEvent = () => {
+            if (AppState.executionTemp.text) {
+                const timeInput = document.getElementById('exec-time');
+                let timeStr = new Date().toISOString();
+                if (timeInput && timeInput.value.trim()) {
+                    let formatted = formatTimeInput(timeInput.value.trim());
+                    if (formatted.length === 8) {
+                        timeStr = new Date().toISOString().slice(0, 11) + formatted + 'Z';
+                    }
+                }
+                AppState.mission.exec.events.unshift({ id: 'evt_' + Date.now(), time: timeStr, text: AppState.executionTemp.text });
+                AppState.executionTemp.text = "";
+                if (timeInput) timeInput.value = "";
+                Render.view(); Storage.save();
+                setTimeout(() => document.getElementById('exec-input').focus(), 50);
+            }
+        };
+        window.addReconEvent = () => {
+            let t = prompt("Time (HH:MM:SS or HHMMSS)", new Date().toLocaleTimeString('en-GB', { hour12: false }));
+            if (t) {
+                t = formatTimeInput(t);
+                AppState.mission.exec.events.push({ id: 'evt_' + Date.now(), time: new Date().toISOString().slice(0, 11) + t, text: 'New Event' });
+                Render.view(); Storage.save();
+            }
+        };
+
+        window.removeEvent = (id) => {
+            if (confirm("Delete this event?")) {
+                AppState.mission.exec.events = AppState.mission.exec.events.filter(e => e.id !== id);
+                if (AppState.mission.recon.dfpCandidates[id]) delete AppState.mission.recon.dfpCandidates[id];
+                Render.view(); Storage.save();
+            }
+        };
+
+        window.updateEventTime = (id, val) => {
+            const e = AppState.mission.exec.events.find(x => x.id === id);
+            if (e) {
+                const fmt = formatTimeInput(val);
+                e.time = e.time.slice(0, 11) + fmt + (e.time.length > 19 ? e.time.slice(19) : ''); // Preserve timezone if any, though usually just replaces HH:MM:SS
+                Render.view(); Storage.save();
+            }
+        };
+
+        window.formatTimeInput = (str) => {
+            const clean = str.replace(/[^0-9]/g, '');
+            if (clean.length === 6) return `${clean.slice(0, 2)}:${clean.slice(2, 4)}:${clean.slice(4, 6)}`;
+            if (clean.length === 4) return `${clean.slice(0, 2)}:${clean.slice(2, 4)}:00`;
+            if (str.includes(':')) return str; // return as is if already formatted
+            return str; // fallback
+        };
+
+        window.updateEvent = (id, v) => { const e = AppState.mission.exec.events.find(x => x.id === id); if (e) { e.text = v; Storage.save(); } };
+
+        // --- DRAG & DROP HANDLERS ---
+        window.drag = (e, id) => {
+            e.dataTransfer.setData("text/plain", id);
+            e.dataTransfer.effectAllowed = "move";
+            e.currentTarget.classList.add('dragging');
+        };
+
+        window.allowDrop = (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = "move";
+            const target = e.target.closest('.dfp-chip');
+            if (target) target.classList.add('drag-over');
+        };
+
+        window.dragLeave = (e) => {
+            const target = e.target.closest('.dfp-chip');
+            if (target) target.classList.remove('drag-over');
+        };
+
+        window.drop = (e, targetId) => {
+            e.preventDefault();
+            document.querySelectorAll('.dfp-chip').forEach(el => el.classList.remove('drag-over', 'dragging'));
+
+            const draggedId = e.dataTransfer.getData("text/plain");
+            if (!draggedId || draggedId === targetId) return;
+
+            const list = AppState.mission.analysis.dfps;
+            const fromIndex = list.findIndex(d => d.id === draggedId);
+            const toIndex = list.findIndex(d => d.id === targetId);
+
+            if (fromIndex > -1 && toIndex > -1) {
+                const [item] = list.splice(fromIndex, 1);
+                list.splice(toIndex, 0, item);
+
+                // Enforce Grouping: DFP first, then LP
+                const newDfps = list.filter(d => (d.type || 'DFP') === 'DFP');
+                const newLps = list.filter(d => d.type === 'LP');
+                AppState.mission.analysis.dfps = [...newDfps, ...newLps];
+
+                Render.view();
+                Storage.save();
+            }
+        };
+
+        // --- UTILS ---
+        window.autoResize = (el) => {
+            el.style.height = 'auto';
+            el.style.height = (el.scrollHeight + 2) + 'px';
+        };
+
+        // --- GLOBAL LISTENERS ---
+        document.addEventListener('input', (e) => {
+            if (e.target.tagName === 'TEXTAREA') window.autoResize(e.target);
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+                e.preventDefault();
+                History.undo();
+            } else if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.shiftKey && e.key === 'Z'))) {
+                e.preventDefault();
+                History.redo();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+                e.preventDefault();
+                History.undo();
+            } else if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.shiftKey && e.key === 'Z'))) {
+                e.preventDefault();
+                History.redo();
+            }
+        });
+
+        window.toggleDfp = (id) => {
+            const cur = AppState.mission.recon.dfpCandidates[id];
+            if (!cur) AppState.mission.recon.dfpCandidates[id] = 'DFP';
+            else if (cur === 'DFP' || cur === true) AppState.mission.recon.dfpCandidates[id] = 'LP';
+            else delete AppState.mission.recon.dfpCandidates[id];
+            Render.view(); Storage.save();
+        };
+        window.selectDfp = (id) => { AppState.activeDfpId = id; Render.view(); };
+        window.updateDfp = (f, v) => { const d = AppState.mission.analysis.dfps.find(x => x.id === AppState.activeDfpId); if (d) { d[f] = v; Storage.save(); if (f === 'type') Render.view(); } };
+        window.addCf = () => { const d = AppState.mission.analysis.dfps.find(x => x.id === AppState.activeDfpId); if (d) { d.cfs.push({ factor: "", miniIf: "" }); Render.view(); Storage.save(); } };
+        window.updateCf = (i, f, v) => { const d = AppState.mission.analysis.dfps.find(x => x.id === AppState.activeDfpId); if (d) { d.cfs[i][f] = v; Storage.save(); if (f === 'miniIf') Render.view(); } };
+        window.updateCfRc = (i) => {
+            const d = AppState.mission.analysis.dfps.find(x => x.id === AppState.activeDfpId);
+            if (d) {
+                const oldRcIndex = d.rcIndex;
+                const newRcIndex = (d.rcIndex === i) ? null : i;
+
+                // 1. Save Old RC content if valid
+                if (oldRcIndex !== null && d.cfs[oldRcIndex]) {
+                    // Move Main IF "Conclusion" back to Mini-IF of the old RC
+                    d.cfs[oldRcIndex].miniIf = d.primaryIF.conclusion;
+                    // Reset primary IF fields to avoid carrying over unrelated data
+                    d.primaryIF.issue = "";
+                    d.primaryIF.ref = "";
+                    d.primaryIF.analysis = "";
+                }
+
+                // 2. Load New RC content if valid
+                if (newRcIndex !== null && d.cfs[newRcIndex]) {
+                    // Promote Mini-IF of the new RC to Main IF "Conclusion"
+                    d.primaryIF.conclusion = d.cfs[newRcIndex].miniIf || "";
+                    // Clear the Mini-IF on the CF itself to avoid duplication
+                    d.cfs[newRcIndex].miniIf = "";
+                } else if (newRcIndex === null) {
+                    // If deselecting, just clear the main IF (data was saved to old RC in step 1)
+                    d.primaryIF.conclusion = "";
+                }
+
+                d.rcIndex = newRcIndex;
+
+                // Save scroll position
+                const scrollContainer = document.getElementById('analysis-center-scroll');
+                const scrollTop = scrollContainer ? scrollContainer.scrollTop : 0;
+
+                Render.view();
+                Storage.save();
+
+                // Restore scroll position
+                const newContainer = document.getElementById('analysis-center-scroll');
+                if (newContainer) newContainer.scrollTop = scrollTop;
+            }
+        };
+
+        window.removeDfp = (e, id) => {
+            e.stopPropagation();
+            if (!confirm("Delete this item? This cannot be undone.")) return;
+
+            const dIndex = AppState.mission.analysis.dfps.findIndex(x => x.id === id);
+            if (dIndex === -1) return;
+            const d = AppState.mission.analysis.dfps[dIndex];
+
+            // Unlink from candidates if applicable
+            if (d.linkedEventId && AppState.mission.recon.dfpCandidates[d.linkedEventId]) {
+                delete AppState.mission.recon.dfpCandidates[d.linkedEventId];
+            }
+
+            // Remove from array
+            AppState.mission.analysis.dfps.splice(dIndex, 1);
+
+            // Reselect if active was deleted
+            if (AppState.activeDfpId === id) {
+                AppState.activeDfpId = AppState.mission.analysis.dfps.length > 0 ? AppState.mission.analysis.dfps[0].id : null;
+            }
+
+            Render.view();
+            Storage.save();
+        };
+
+        window.removeCf = (i) => { const d = AppState.mission.analysis.dfps.find(x => x.id === AppState.activeDfpId); if (d) { d.cfs.splice(i, 1); if (d.rcIndex === i) d.rcIndex = null; Render.view(); Storage.save(); } };
+        window.updateIF = (f, v) => { const d = AppState.mission.analysis.dfps.find(x => x.id === AppState.activeDfpId); if (d) { d.primaryIF[f] = v; Storage.save(); } };
+        window.addManualDfp = () => {
+            const newId = 'dfp_' + Date.now() + Math.random().toString().slice(2, 5);
+            AppState.mission.analysis.dfps.push({
+                id: newId, linkedEventId: null,
+                type: 'DFP',
+                question: "Why...?",
+                cfs: [], rcIndex: null, primaryIF: { issue: "", ref: "", analysis: "", conclusion: "", verification: "" }, l2: "", lead: ""
+            });
+            AppState.activeDfpId = newId;
+            Render.view(); Storage.save();
+        };
+
+        window.copyL2Prompt = () => {
+            const d = AppState.mission.analysis.dfps.find(x => x.id === AppState.activeDfpId);
+            if (!d) return;
+
+            const cfList = d.cfs.map((c, i) => {
+                const isRc = d.rcIndex === i;
+                const typeLabel = isRc ? "[ROOT CAUSE]" : `CF #${i + 1}`;
+                const miniIf = c.miniIf ? ` (Mini-IF: "${c.miniIf}")` : "";
+                return `  ${i + 1}. ${typeLabel} ${c.factor}${miniIf}`;
+            }).join('\n');
+
+            const prompt = `Act as an expert Instructor Pilot using the "Debrief Primer" methodology.
+Your goal is to synthesize the provided analysis into a concise "Lesson Learned (L2) Summary".
+
+Methodology Context:
+- The L2 Summary is the "One Thing" to take away to prevent this specific Root Cause in the future.
+- It must be Generalizable (applicable to future flights/missions, not just this specific event).
+- It must be Action-Oriented (start with an imperative verb like "Always verify...", "Prioritize...", "Ensure...").
+- Keep it concise (1-2 sentences absolute max).
+- Provide the output in both English and French.
+
+Current Analysis Data:
+- Divergence (Question): ${d.question}
+- Lead/Owner: ${d.lead || "Not specific"}
+- Contributing Factors (CFs):
+${cfList}
+- Instructional Fix (Specific Solution for this event): ${d.primaryIF.conclusion || "Not defined"}
+
+Task:
+Based strictly on the analysis above, write the perfect Lesson Learned Summary in English and French.`;
+
+            navigator.clipboard.writeText(prompt).then(() => {
+                const btn = document.querySelector('button[title="Copy AI Prompt for L2 Generation"]');
+                if (btn) {
+                    const original = btn.innerHTML;
+                    btn.innerHTML = "âœ…";
+                    setTimeout(() => btn.innerHTML = original, 1500);
+                }
+            });
+        };
+
+        window.copyFinalSummaryPrompt = () => {
+            const m = AppState.mission;
+
+            const sections = [];
+
+            // 1. Mission Context
+            sections.push(`MISSION CONTEXT:
+         - Title: ${m.meta.title || 'Untitled'}
+         - Overview: ${m.meta.overview || 'N/A'}`);
+
+            // 2. Objectives
+            const objList = [
+                ...m.prep.missionObjs.map(o => `[Mission Obj] ${o.text}`),
+                ...m.prep.tacticalObjs.map(o => `[Tactical Obj] ${o.text}`),
+                ...m.prep.perfObjs.map(o => `[Perf Obj] ${o.text}`),
+                ...m.prep.dlos.map(o => `[DLO] ${o.text}`)
+            ];
+            if (objList.length) sections.push(`OBJECTIVES:\n${objList.join('\n')}`);
+
+            // 3. Analysis (DFPs/LPs)
+            const analysisData = m.analysis.dfps.map((d, i) => {
+                const type = d.type || 'DFP';
+                let txt = `${type} #${i + 1}: "${d.question}" (Lead: ${d.lead || 'N/A'})`;
+
+                // CFs
+                if (d.cfs && d.cfs.length) {
+                    txt += `\n  Contributing Factors:`;
+                    d.cfs.forEach((cf, cfi) => {
+                        const isRc = d.rcIndex === cfi;
+                        txt += `\n    - ${isRc ? '[ROOT CAUSE] ' : ''}${cf.factor}`;
+                        if (cf.miniIf) txt += ` (Fix: ${cf.miniIf})`;
+                    });
+                }
+
+                // IF and L2
+                if (d.primaryIF && d.primaryIF.conclusion) txt += `\n  Instructional Fix: ${d.primaryIF.conclusion}`;
+                if (d.l2) txt += `\n  Lesson Learned: ${d.l2}`;
+
+                return txt;
+            }).join('\n\n');
+
+            if (analysisData) sections.push(`ANALYSIS & FINDINGS:\n${analysisData}`);
+
+            // Construct Prompt
+            const prompt = `Act as an expert Debrief Leader and Instructor Pilot using the "Debrief Primer" methodology.
+         Your task is to write a comprehensive "Final Summary & Trends" for the mission report.
+
+         INPUT DATA:
+         ${sections.join('\n\n')}
+
+         INSTRUCTIONS:
+         1. Identify Trends: Look for common threads across the DFPs/LPs (e.g. recurring root causes like "Perception - Visual", specific communication failures, or planning gaps).
+         2. Assess Effectiveness: Briefly state if the core mission objectives were likely met based on the analysis.
+         3. Synthesize: Write a cohesive summary that highlights the main takeaways and the "big picture" lessons.
+         4. Output Format:
+            - Provide the text in French (Francais).
+            - Provide the text in English (Anglais).
+            - Use a professional, constructive, and instructional tone.`;
+
+            navigator.clipboard.writeText(prompt).then(() => {
+                const btn = document.getElementById('btn-copy-summary-prompt');
+                if (btn) {
+                    const original = btn.innerHTML;
+                    btn.innerHTML = "âœ…";
+                    setTimeout(() => btn.innerHTML = original, 1500);
+                }
+            });
+        };
+
+        // --- BOOTSTRAP ---
+        Storage.load(); Render.init(); Tooltip.init();
+    </script>
+    <script>
+        (function registerNoCachePwa() {
+            if (!('serviceWorker' in navigator)) return;
+            window.addEventListener('load', async () => {
+                try {
+                    if ('caches' in window) {
+                        const keys = await caches.keys();
+                        await Promise.all(keys.map((key) => caches.delete(key)));
+                    }
+                    await navigator.serviceWorker.register('./sw.js', { scope: './' });
+                } catch (error) {
+                    console.warn('Service worker registration failed:', error);
+                }
+            });
+        })();
+    </script>
+</body>
+
+</html>
+
