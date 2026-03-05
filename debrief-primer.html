@@ -435,6 +435,11 @@
             white-space: nowrap;
             font-size: 0.9rem;
             margin-top: 2px;
+            flex: 0 0 9ch;
+            width: 9ch !important;
+            min-width: 9ch;
+            padding-right: 0.35rem;
+            overflow: visible;
         }
 
         .timeline-content {
@@ -1742,7 +1747,7 @@
                 ${sorted.map(ev => `
                     <div class="timeline-item flex justify-between items-start">
                         <div class="flex gap-md w-full items-center">
-                            <input class="timeline-time" style="background:transparent;border:none;width:80px;cursor:pointer" value="${ev.time.slice(11, 19)}" onchange="updateEventTime('${ev.id}', this.value)">
+                            <input class="timeline-time" style="background:transparent;border:none;cursor:pointer" value="${ev.time.slice(11, 19)}" onchange="updateEventTime('${ev.id}', this.value)">
                             <div class="timeline-content w-full flex items-center">
                                 <input class="w-full text-sm" style="background:transparent;border:none;color:inherit" value="${ev.text}" onchange="updateEvent('${ev.id}', this.value)">
                             </div>
@@ -1760,7 +1765,7 @@
                     return `<div class="timeline-item ${isDfp ? 'dfp-candidate' : ''}"><div class="w-full">
                 <div class="flex justify-between items-center mb-1">
                     <div class="flex items-center gap-sm">
-                        <input class="timeline-time" style="background:transparent;border:none;width:80px;cursor:pointer" value="${ev.time.slice(11, 19)}" onchange="updateEventTime('${ev.id}', this.value)">
+                        <input class="timeline-time" style="background:transparent;border:none;cursor:pointer" value="${ev.time.slice(11, 19)}" onchange="updateEventTime('${ev.id}', this.value)">
                     </div>
                     <div class="flex gap-sm">
                         <button class="tag-btn ${isDfp ? 'selected' : ''}" 
