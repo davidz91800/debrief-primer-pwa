@@ -90,6 +90,11 @@
             font-family: inherit;
         }
 
+        button:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
         /* --- UTILITIES --- */
         .hidden-on-screen {
             display: none !important;
@@ -205,7 +210,7 @@
         /* --- LAYOUT --- */
         #app-header,
         #app-footer {
-            height: 60px;
+            min-height: 60px;
             background: var(--bg-card);
             padding: 0 var(--spacing-lg);
             display: flex;
@@ -218,6 +223,10 @@
 
         #app-header {
             border-bottom-width: 1px;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
         }
 
         #mission-status {
@@ -242,15 +251,15 @@
         }
 
         #app-footer {
-            height: 80px;
             background: var(--bg-card);
             border-top: 1px solid var(--border-color);
-            padding: 0 var(--spacing-lg);
+            padding: 0.75rem var(--spacing-lg) max(0.75rem, env(safe-area-inset-bottom));
             display: grid;
             grid-template-columns: 1fr auto 1fr;
             align-items: center;
             z-index: 100;
             flex-shrink: 0;
+            gap: 0.75rem;
         }
 
         /* --- COMPONENTS --- */
@@ -724,7 +733,8 @@
             gap: 0.5rem;
             align-items: center;
             z-index: 30;
-            /* Above tabs if screen is small */
+            margin-left: auto;
+            max-width: 100%;
         }
 
         .header-btn {
@@ -776,6 +786,116 @@
             gap: 0.5rem;
             align-items: center;
             justify-self: end;
+            position: relative;
+        }
+
+        .footer-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 0;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.45rem 0.7rem;
+            border-radius: 999px;
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            background: rgba(59, 130, 246, 0.12);
+            color: #bfdbfe;
+            font-size: 0.8rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .status-pill::before {
+            content: '';
+            width: 0.45rem;
+            height: 0.45rem;
+            border-radius: 999px;
+            background: #60a5fa;
+            box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.14);
+        }
+
+        .status-pill.is-saving {
+            border-color: rgba(249, 115, 22, 0.35);
+            background: rgba(249, 115, 22, 0.12);
+            color: #fed7aa;
+        }
+
+        .status-pill.is-saving::before {
+            background: #fb923c;
+            box-shadow: 0 0 0 4px rgba(251, 146, 60, 0.14);
+        }
+
+        .status-pill.is-error {
+            border-color: rgba(239, 68, 68, 0.35);
+            background: rgba(239, 68, 68, 0.12);
+            color: #fecaca;
+        }
+
+        .status-pill.is-error::before {
+            background: #f87171;
+            box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.14);
+        }
+
+        .footer-meta-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .footer-actions-panel {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .footer-menu-btn {
+            display: none;
+        }
+
+        .footer-sheet-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.6);
+            backdrop-filter: blur(2px);
+            display: none;
+            z-index: 998;
+        }
+
+        .footer-sheet-backdrop.show {
+            display: block;
+        }
+
+        #toast {
+            position: fixed;
+            left: 50%;
+            bottom: calc(100px + env(safe-area-inset-bottom));
+            transform: translate(-50%, 12px);
+            min-width: 240px;
+            max-width: min(92vw, 460px);
+            padding: 0.85rem 1rem;
+            border-radius: 14px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            background: rgba(15, 23, 42, 0.96);
+            color: var(--text-main);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            z-index: 1100;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        #toast.show {
+            opacity: 1;
+            transform: translate(-50%, 0);
         }
 
         /* --- PRINT --- */
@@ -912,8 +1032,95 @@
 
         /* --- RESPONSIVE / IPAD --- */
         @media (max-width: 1024px) {
+            #app-header {
+                align-items: flex-start;
+            }
+
+            .header-actions {
+                width: 100%;
+                order: 3;
+                margin-left: 0;
+            }
+
+            .nav-tabs {
+                max-width: 100%;
+            }
+
             #app-main {
                 padding: var(--spacing-md);
+            }
+
+            #app-footer {
+                grid-template-columns: 1fr;
+                justify-items: stretch;
+            }
+
+            .footer-status,
+            .footer-actions,
+            #app-footer > .flex.gap-md {
+                width: 100%;
+            }
+
+            .footer-status {
+                justify-content: space-between;
+            }
+
+            #app-footer > .flex.gap-md {
+                justify-content: center;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .footer-actions {
+                justify-content: flex-end;
+            }
+
+            .footer-meta-actions {
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+
+            .btn-nav {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .footer-menu-btn {
+                display: inline-flex;
+            }
+
+            .footer-actions-panel {
+                position: fixed;
+                left: 50%;
+                right: auto;
+                bottom: max(16px, env(safe-area-inset-bottom));
+                transform: translate(-50%, 12px);
+                width: min(92vw, 560px);
+                padding: 0.9rem;
+                border-radius: 18px;
+                border: 1px solid var(--border-color);
+                background: rgba(30, 41, 59, 0.98);
+                box-shadow: 0 18px 48px rgba(0, 0, 0, 0.38);
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.75rem;
+                opacity: 0;
+                pointer-events: none;
+                z-index: 999;
+                justify-content: stretch;
+                transition: opacity 0.2s ease, transform 0.2s ease;
+            }
+
+            .footer-actions-panel.open {
+                opacity: 1;
+                pointer-events: auto;
+                transform: translate(-50%, 0);
+            }
+
+            .footer-actions-panel .btn {
+                justify-content: center;
+                text-align: center;
+                min-height: 48px;
             }
 
             .grid-2,
@@ -949,7 +1156,7 @@
             }
 
             #mission-status {
-                max-width: 150px;
+                max-width: 100%;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -962,11 +1169,13 @@
 
     <!-- TOOLTIP OVERLAY -->
     <div id="tooltip-backdrop"></div>
+    <div id="footer-sheet-backdrop" class="footer-sheet-backdrop"></div>
     <div id="tooltip-container">
         <button id="tooltip-close" type="button" aria-label="Close tooltip">×</button>
         <h4 id="tooltip-title"></h4>
         <div id="tooltip-content"></div>
     </div>
+    <div id="toast" aria-live="polite" aria-atomic="true"></div>
 
     <!-- DATA EMBED -->
     <script id="dfp-data" type="application/json"></script>
@@ -991,7 +1200,13 @@
 
     <!-- FOOTER -->
     <footer id="app-footer">
-        <div></div> <!-- Spacer for grid -->
+        <div class="footer-status">
+            <span id="save-indicator" class="status-pill">Saved</span>
+            <div class="footer-meta-actions">
+                <button id="btn-undo" class="btn btn-secondary header-btn" onclick="History.undo()">Undo</button>
+                <button id="btn-redo" class="btn btn-secondary header-btn" onclick="History.redo()">Redo</button>
+            </div>
+        </div>
 
         <div class="flex gap-md">
             <button id="btn-prev" class="btn btn-nav btn-prev" onclick="prevPage()">
@@ -1004,6 +1219,10 @@
         </div>
 
         <div class="footer-actions">
+            <button id="footer-actions-toggle" class="btn btn-secondary header-btn footer-menu-btn" onclick="Ui.toggleActionsMenu()">
+                Actions
+            </button>
+            <div id="footer-actions-panel" class="footer-actions-panel">
             <input type="file" id="import-json" style="display:none" accept=".json" onchange="Storage.importJSON(this)">
             <button id="btn-load-json" class="btn btn-secondary header-btn"
                 onclick="document.getElementById('import-json').click()">0. Load JSON 📂</button>
@@ -1013,6 +1232,7 @@
                 style="border-color:var(--accent-primary); color:var(--accent-primary)" onclick="Storage.sendQwiEmail()"
                 title="Don't forget to attach the JSON file!">2. Send to QWI 📧</button>
             <button id="btn-reset" class="btn btn-secondary header-btn" onclick="Storage.reset()">🗑️ Reset</button>
+            </div>
         </div>
     </footer>
 
@@ -1122,14 +1342,69 @@
                 History.stack = [];
                 History.ptr = -1;
                 History.push();
+                if (document.getElementById('btn-undo')) Render.indicators();
+            }
+        };
+
+        const Ui = {
+            toastTimer: null,
+            isCompactActions: () => window.matchMedia('(max-width: 1024px)').matches,
+            setSaveState: (label, tone = 'saved') => {
+                const el = document.getElementById('save-indicator');
+                if (!el) return;
+                el.textContent = label;
+                el.classList.toggle('is-saving', tone === 'saving');
+                el.classList.toggle('is-error', tone === 'error');
+            },
+            showToast: (message, duration = 2200) => {
+                const toast = document.getElementById('toast');
+                if (!toast) return;
+                toast.textContent = message;
+                toast.classList.add('show');
+                clearTimeout(Ui.toastTimer);
+                Ui.toastTimer = setTimeout(() => toast.classList.remove('show'), duration);
+            },
+            closeActionsMenu: () => {
+                const panel = document.getElementById('footer-actions-panel');
+                const backdrop = document.getElementById('footer-sheet-backdrop');
+                if (!panel || !backdrop) return;
+                panel.classList.remove('open');
+                backdrop.classList.remove('show');
+            },
+            toggleActionsMenu: (forceOpen) => {
+                const panel = document.getElementById('footer-actions-panel');
+                const backdrop = document.getElementById('footer-sheet-backdrop');
+                if (!panel || !backdrop || !Ui.isCompactActions()) return;
+                const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !panel.classList.contains('open');
+                panel.classList.toggle('open', shouldOpen);
+                backdrop.classList.toggle('show', shouldOpen);
+            },
+            init: () => {
+                const backdrop = document.getElementById('footer-sheet-backdrop');
+                const panel = document.getElementById('footer-actions-panel');
+                const toggle = document.getElementById('footer-actions-toggle');
+                if (backdrop) backdrop.addEventListener('click', Ui.closeActionsMenu);
+                document.addEventListener('click', (e) => {
+                    if (!Ui.isCompactActions()) return;
+                    if (toggle && toggle.contains(e.target)) return;
+                    if (panel && panel.contains(e.target)) return;
+                    Ui.closeActionsMenu();
+                });
+                window.addEventListener('resize', () => {
+                    if (!Ui.isCompactActions()) Ui.closeActionsMenu();
+                });
+                Ui.setSaveState('Saved');
             }
         };
 
         // --- SERVICES ---
         const Storage = {
             save: (skipHistory = false) => {
+                Ui.setSaveState('Saving...', 'saving');
                 localStorage.setItem('debrief_data', JSON.stringify(AppState.mission));
                 if (!skipHistory) History.push();
+                if (document.getElementById('btn-undo')) Render.indicators();
+                Ui.setSaveState('Saved');
             },
             load: () => {
                 const embedded = document.getElementById('dfp-data').textContent;
@@ -1146,12 +1421,15 @@
                         const loaded = JSON.parse(d);
                         Storage.processLoadedData(loaded);
                         setTimeout(() => History.init(), 100); // Init history after load
+                        Ui.setSaveState('Saved');
                     } catch (e) {
                         console.error("Failed to parse data:", e);
+                        Ui.setSaveState('Load error', 'error');
                     }
                 } else {
                     // Fallback init if no data
                     setTimeout(() => History.init(), 100);
+                    Ui.setSaveState('Ready');
                 }
             },
             reset: () => { if (confirm("Reset all data?")) { localStorage.clear(); location.reload(); } },
@@ -1161,6 +1439,8 @@
                 dlAnchor.setAttribute("href", dataStr);
                 dlAnchor.setAttribute("download", `debrief_${AppState.mission.meta.title || 'mission'}_${new Date().toISOString().slice(0, 10)}.json`);
                 document.body.appendChild(dlAnchor); dlAnchor.click(); dlAnchor.remove();
+                Ui.showToast('JSON exported');
+                Ui.closeActionsMenu();
             },
             sendQwiEmail: () => {
                 const title = AppState.mission.meta.title || "Mission";
@@ -1171,6 +1451,8 @@
                 const body = `Bonjour,\n\nVeuillez trouver ci-joint le fichier de débriefing (.json) pour la mission suivante :\n\n- Date : ${date}\n- Mission : ${title}\n- MC : ${mc}\n\nCordialement.\n\n(Rappel : N'oubliez pas de joindre le fichier .json exporté)`;
 
                 window.location.href = `mailto:ciet-qwi.contact.fct@intradef.gouv.fr?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                Ui.showToast('Opening email client');
+                Ui.closeActionsMenu();
             },
             importJSON: (input) => {
                 const file = input.files[0];
@@ -1184,9 +1466,11 @@
                         Storage.save(); // Save to local storage
                         Render.indicators(); // Refresh UI
                         Render.view();
-                        alert("Mission loaded successfully!");
+                        Ui.showToast('Mission loaded successfully');
+                        Ui.closeActionsMenu();
                     } catch (err) {
-                        alert("Error loading JSON: " + err.message);
+                        Ui.showToast("Error loading JSON: " + err.message, 3200);
+                        Ui.setSaveState('Load error', 'error');
                     }
                 };
                 reader.readAsText(file);
@@ -1295,6 +1579,8 @@
                 // Update Nav Buttons
                 const prevBtn = document.getElementById('btn-prev');
                 const nextBtn = document.getElementById('btn-next');
+                const undoBtn = document.getElementById('btn-undo');
+                const redoBtn = document.getElementById('btn-redo');
 
                 if (AppState.currentPhase === 0) {
                     prevBtn.style.visibility = 'hidden';
@@ -1308,6 +1594,9 @@
                     nextBtn.style.display = 'flex';
                     nextBtn.innerHTML = `Next: ${PHASES[AppState.currentPhase + 1].label.split('. ')[1]} <span>→</span>`;
                 }
+
+                if (undoBtn) undoBtn.disabled = History.ptr <= 0;
+                if (redoBtn) redoBtn.disabled = History.ptr >= History.stack.length - 1;
             },
             view: () => {
                 const main = document.getElementById('app-main');
@@ -2135,16 +2424,6 @@
             }
         });
 
-        document.addEventListener('keydown', (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
-                e.preventDefault();
-                History.undo();
-            } else if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.shiftKey && e.key === 'Z'))) {
-                e.preventDefault();
-                History.redo();
-            }
-        });
-
         window.toggleDfp = (id) => {
             const cur = AppState.mission.recon.dfpCandidates[id];
             if (!cur) AppState.mission.recon.dfpCandidates[id] = 'DFP';
@@ -2348,7 +2627,7 @@ Based strictly on the analysis above, write the perfect Lesson Learned Summary i
         };
 
         // --- BOOTSTRAP ---
-        Storage.load(); Render.init(); Tooltip.init();
+        Ui.init(); Storage.load(); Render.init(); Tooltip.init();
     </script>
     <script>
         (function registerNoCachePwa() {
