@@ -438,6 +438,25 @@
             color: var(--accent-secondary);
             margin-left: 0.25rem;
             font-size: 0.9em;
+            background: transparent;
+            border: 0;
+            padding: 0;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        #tooltip-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.6);
+            backdrop-filter: blur(2px);
+            display: none;
+            z-index: 999;
+        }
+
+        #tooltip-backdrop.show {
+            display: block;
         }
 
         #tooltip-container {
@@ -458,6 +477,53 @@
         #tooltip-container h4 {
             color: var(--accent-secondary);
             margin-bottom: 0.5rem;
+        }
+
+        #tooltip-close {
+            display: none;
+            position: absolute;
+            top: 0.4rem;
+            right: 0.4rem;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.2);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            font-size: 1.1rem;
+            line-height: 1;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        #tooltip-container.touch-open {
+            display: block;
+            left: 50% !important;
+            top: auto !important;
+            bottom: max(16px, env(safe-area-inset-bottom));
+            transform: translateX(-50%);
+            width: min(92vw, 560px);
+            max-height: 55vh;
+            overflow-y: auto;
+            pointer-events: auto;
+            z-index: 1000;
+            padding: 1rem 1rem 1rem 1rem;
+        }
+
+        #tooltip-container.touch-open #tooltip-close {
+            display: inline-flex;
+        }
+
+        @media (hover: none), (pointer: coarse) {
+            .info-trigger {
+                min-width: 1.6rem;
+                min-height: 1.6rem;
+                justify-content: center;
+                border-radius: 999px;
+                background: rgba(249, 115, 22, 0.12);
+                margin-left: 0.35rem;
+            }
         }
 
         /* --- ANALYSIS SPECIFIC --- */
@@ -895,7 +961,9 @@
 <body>
 
     <!-- TOOLTIP OVERLAY -->
+    <div id="tooltip-backdrop"></div>
     <div id="tooltip-container">
+        <button id="tooltip-close" type="button" aria-label="Close tooltip">×</button>
         <h4 id="tooltip-title"></h4>
         <div id="tooltip-content"></div>
     </div>
@@ -1153,21 +1221,62 @@
         const Tooltip = {
             init: () => {
                 const con = document.getElementById('tooltip-container');
+                const backdrop = document.getElementById('tooltip-backdrop');
+                const closeBtn = document.getElementById('tooltip-close');
                 const title = document.getElementById('tooltip-title');
                 const body = document.getElementById('tooltip-content');
-                document.body.addEventListener('mousemove', (e) => {
-                    const el = e.target.closest('.info-trigger');
-                    if (el) {
-                        const def = DEFINITIONS[el.dataset.key];
-                        if (def) {
-                            title.textContent = def.title; body.textContent = def.text; con.style.display = 'block';
-                            con.style.left = Math.min(e.clientX + 15, window.innerWidth - 320) + 'px';
-                            con.style.top = Math.min(e.clientY + 15, window.innerHeight - con.offsetHeight - 20) + 'px';
+
+                const isTouchUi = () => window.matchMedia('(hover: none), (pointer: coarse)').matches;
+                const setContent = (def) => {
+                    title.textContent = def.title;
+                    body.textContent = def.text;
+                };
+                const closeTouchTooltip = () => {
+                    con.classList.remove('touch-open');
+                    backdrop.classList.remove('show');
+                    con.style.display = 'none';
+                };
+
+                if (!isTouchUi()) {
+                    document.body.addEventListener('mousemove', (e) => {
+                        if (con.classList.contains('touch-open')) return;
+                        const el = e.target.closest('.info-trigger');
+                        if (el) {
+                            const def = DEFINITIONS[el.dataset.key];
+                            if (def) {
+                                setContent(def);
+                                con.style.display = 'block';
+                                con.style.left = Math.min(e.clientX + 15, window.innerWidth - 320) + 'px';
+                                con.style.top = Math.min(e.clientY + 15, window.innerHeight - con.offsetHeight - 20) + 'px';
+                                return;
+                            }
                         }
-                    } else { con.style.display = 'none'; }
+                        con.style.display = 'none';
+                    });
+                }
+
+                document.body.addEventListener('click', (e) => {
+                    const el = e.target.closest('.info-trigger');
+                    if (el && isTouchUi()) {
+                        const def = DEFINITIONS[el.dataset.key];
+                        if (!def) return;
+                        e.preventDefault();
+                        setContent(def);
+                        con.style.display = 'block';
+                        con.classList.add('touch-open');
+                        backdrop.classList.add('show');
+                        return;
+                    }
+
+                    if (con.classList.contains('touch-open') && !con.contains(e.target)) {
+                        closeTouchTooltip();
+                    }
                 });
+
+                backdrop.addEventListener('click', closeTouchTooltip);
+                closeBtn.addEventListener('click', closeTouchTooltip);
             },
-            icon: (key) => `<span class="info-trigger" data-key="${key}">ⓘ</span>`
+            icon: (key) => `<button type="button" class="info-trigger" data-key="${key}" aria-label="Info">ⓘ</button>`
         };
 
         // --- RENDERERS ---
