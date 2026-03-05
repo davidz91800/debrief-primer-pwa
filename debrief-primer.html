@@ -934,24 +934,24 @@
 
         <div class="flex gap-md">
             <button id="btn-prev" class="btn btn-nav btn-prev" onclick="prevPage()">
-                <span>â†</span> Previous
+                <span>←</span> Previous
             </button>
 
             <button id="btn-next" class="btn btn-nav btn-next" onclick="nextPage()">
-                Next <span>â†’</span>
+                Next <span>→</span>
             </button>
         </div>
 
         <div class="footer-actions">
             <input type="file" id="import-json" style="display:none" accept=".json" onchange="Storage.importJSON(this)">
             <button id="btn-load-json" class="btn btn-secondary header-btn"
-                onclick="document.getElementById('import-json').click()">0. Load JSON ðŸ“‚</button>
+                onclick="document.getElementById('import-json').click()">0. Load JSON 📂</button>
             <button id="btn-save" class="btn btn-secondary header-btn" onclick="Storage.exportJSON()">1. Export JSON
-                ðŸ’¾</button>
+                💾</button>
             <button id="btn-qwi" class="btn btn-secondary header-btn"
                 style="border-color:var(--accent-primary); color:var(--accent-primary)" onclick="Storage.sendQwiEmail()"
-                title="Don't forget to attach the JSON file!">2. Send to QWI ðŸ“§</button>
-            <button id="btn-reset" class="btn btn-secondary header-btn" onclick="Storage.reset()">ðŸ—‘ï¸ Reset</button>
+                title="Don't forget to attach the JSON file!">2. Send to QWI 📧</button>
+            <button id="btn-reset" class="btn btn-secondary header-btn" onclick="Storage.reset()">🗑️ Reset</button>
         </div>
     </footer>
 
@@ -965,7 +965,7 @@
             "AC": { title: "Aircraft Commander", text: "Responsible for their aircraft/element. Acts as 'mouthpiece' in multi-ship debriefs." },
             "MissionObjectives": { title: "Mission Objectives", text: "The ultimate goal of the sortie (e.g., 'Safe recovery of hostages'). Defined by higher HQ or Commander's Intent." },
             "TacticalObjectives": { title: "Tactical Objectives", text: "Specific actions crews must do to achieve mission success (e.g., 'Drop bundles within 50 yards of PI')." },
-            "PerformanceObjectives": { title: "Performance Objectives", text: "Refined metrics for tactical objectives (e.g., 'Â±50ft altitude, Â±5 kts airspeed'). Execution outside these warrants analysis." },
+            "PerformanceObjectives": { title: "Performance Objectives", text: "Refined metrics for tactical objectives (e.g., '±50ft altitude, ±5 kts airspeed'). Execution outside these warrants analysis." },
             "DLO": { title: "Desired Learning Objectives", text: "Additional goals to raise combat capability (e.g., 'Practice defensive reactions'). Optional in training but critical for growth." },
             "DCP": { title: "Data Collection Plan", text: "Detailed plan of what data to collect, who collects it, and how. Must be solidified BEFORE execution." },
             "Reconstruction": { title: "Reconstruction", text: "Building the 'Big Picture' of what happened. Includes Admin, Data Consolidation, and High-Speed Playback." },
@@ -1107,7 +1107,7 @@
                 const mc = AppState.mission.roles.mc || "Unknown MC";
 
                 const subject = `[DEBRIEF] ${date} - ${title}`;
-                const body = `Bonjour,\n\nVeuillez trouver ci-joint le fichier de dÃ©briefing (.json) pour la mission suivante :\n\n- Date : ${date}\n- Mission : ${title}\n- MC : ${mc}\n\nCordialement.\n\n(Rappel : N'oubliez pas de joindre le fichier .json exportÃ©)`;
+                const body = `Bonjour,\n\nVeuillez trouver ci-joint le fichier de débriefing (.json) pour la mission suivante :\n\n- Date : ${date}\n- Mission : ${title}\n- MC : ${mc}\n\nCordialement.\n\n(Rappel : N'oubliez pas de joindre le fichier .json exporté)`;
 
                 window.location.href = `mailto:ciet-qwi.contact.fct@intradef.gouv.fr?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
             },
@@ -1174,7 +1174,7 @@
                     } else { con.style.display = 'none'; }
                 });
             },
-            icon: (key) => `<span class="info-trigger" data-key="${key}">â“˜</span>`
+            icon: (key) => `<span class="info-trigger" data-key="${key}">ⓘ</span>`
         };
 
         // --- RENDERERS ---
@@ -1204,7 +1204,7 @@
                     nextBtn.style.display = 'none'; // Hide next on last page
                 } else {
                     nextBtn.style.display = 'flex';
-                    nextBtn.innerHTML = `Next: ${PHASES[AppState.currentPhase + 1].label.split('. ')[1]} <span>â†’</span>`;
+                    nextBtn.innerHTML = `Next: ${PHASES[AppState.currentPhase + 1].label.split('. ')[1]} <span>→</span>`;
                 }
             },
             view: () => {
@@ -1281,11 +1281,11 @@
                      ${list.map((itm, i) => `
                         <div class="flex gap-sm mb-2 items-start">
                             <div class="flex flex-col gap-xs">
-                                <button class="btn-icon text-xs" style="line-height:1; padding:0 4px; ${i === 0 ? 'opacity:0.2; pointer-events:none' : ''}" onclick="moveObj('${type}',${i},-1)">â–²</button>
-                                <button class="btn-icon text-xs" style="line-height:1; padding:0 4px; ${i === list.length - 1 ? 'opacity:0.2; pointer-events:none' : ''}" onclick="moveObj('${type}',${i},1)">â–¼</button>
+                                <button class="btn-icon text-xs" style="line-height:1; padding:0 4px; ${i === 0 ? 'opacity:0.2; pointer-events:none' : ''}" onclick="moveObj('${type}',${i},-1)">▲</button>
+                                <button class="btn-icon text-xs" style="line-height:1; padding:0 4px; ${i === list.length - 1 ? 'opacity:0.2; pointer-events:none' : ''}" onclick="moveObj('${type}',${i},1)">▼</button>
                             </div>
                             <textarea class="w-full" rows="1" style="min-height:42px" onchange="updateObj('${type}',${i},this.value)">${itm.text}</textarea>
-                            <button class="btn-icon text-muted hover:text-red-500" onclick="removeObj('${type}',${i})">Ã—</button>
+                            <button class="btn-icon text-muted hover:text-red-500" onclick="removeObj('${type}',${i})">×</button>
                         </div>`).join('')}
                      <button class="btn-premium-add" onclick="addObj('${type}')" style="padding: 0.4rem 0.8rem; font-size: 0.7rem;">
                         <span class="plus-icon" style="width:14px; height:14px; font-size:10px">+</span> Add
@@ -1302,10 +1302,10 @@
                             <td class="p-2 align-top">
                                 <div class="flex gap-sm items-center">
                                     <div class="flex flex-col gap-xs">
-                                        <button class="btn-icon text-xs" style="line-height:1; padding:0 4px; ${i === 0 ? 'opacity:0.2; pointer-events:none' : ''}" onclick="moveDcp(${i},-1)">â–²</button>
-                                        <button class="btn-icon text-xs" style="line-height:1; padding:0 4px; ${i === list.length - 1 ? 'opacity:0.2; pointer-events:none' : ''}" onclick="moveDcp(${i},1)">â–¼</button>
+                                        <button class="btn-icon text-xs" style="line-height:1; padding:0 4px; ${i === 0 ? 'opacity:0.2; pointer-events:none' : ''}" onclick="moveDcp(${i},-1)">▲</button>
+                                        <button class="btn-icon text-xs" style="line-height:1; padding:0 4px; ${i === list.length - 1 ? 'opacity:0.2; pointer-events:none' : ''}" onclick="moveDcp(${i},1)">▼</button>
                                     </div>
-                                    <button class="btn-icon text-muted hover:text-red-500" onclick="removeDcp(${i})">Ã—</button>
+                                    <button class="btn-icon text-muted hover:text-red-500" onclick="removeDcp(${i})">×</button>
                                 </div>
                             </td>
                         </tr>`).join('')}
@@ -1328,7 +1328,7 @@
                 <div class="flex flex-col gap-md">
                     <div class="card bg-gray-900 border border-gray-700">
                         <div class="flex items-start gap-sm">
-                            <div class="text-accent text-xl">â„¹</div>
+                            <div class="text-accent text-xl">ℹ</div>
                             <div class="text-sm text-muted">
                                 <span class="font-bold text-white">Execution Logging Phase</span><br>
                                 This tool is designed for use <b>during the mission</b> or immediately upon landing (e.g. at the step-desk).<br>
@@ -1343,7 +1343,7 @@
                         </div>
                         <textarea id="exec-input" class="w-full mb-2" rows="3" oninput="AppState.executionTemp.text=this.value">${AppState.executionTemp.text}</textarea>
                         <button class="btn-premium-add w-full" onclick="logEvent()" style="justify-content: center; padding: 0.75rem;">
-                            <span class="plus-icon">âš¡</span> Log Event
+                            <span class="plus-icon">⚡</span> Log Event
                         </button>
                     </div>
                 </div>
@@ -1356,7 +1356,7 @@
                                 <input class="w-full text-sm" style="background:transparent;border:none;color:inherit" value="${ev.text}" onchange="updateEvent('${ev.id}', this.value)">
                             </div>
                         </div>
-                        <button class="btn-icon text-muted hover:text-red-500 text-xs" style="opacity:0.5;margin-left:auto" title="Delete" onclick="removeEvent('${ev.id}')">Ã—</button>
+                        <button class="btn-icon text-muted hover:text-red-500 text-xs" style="opacity:0.5;margin-left:auto" title="Delete" onclick="removeEvent('${ev.id}')">×</button>
                     </div>`).join('')}
                 </div></div></div>`;
             },
@@ -1375,9 +1375,9 @@
                         <button class="tag-btn ${isDfp ? 'selected' : ''}" 
                             style="${candType === 'LP' ? 'background:white; color:black; border-color:white' : ''}"
                             onclick="toggleDfp('${ev.id}')">
-                            ${!isDfp ? 'â˜† Mark' : (candType === 'LP' ? 'â˜… LP' : 'â˜… DFP')}
+                            ${!isDfp ? '☆ Mark' : (candType === 'LP' ? '★ LP' : '★ DFP')}
                         </button>
-                        <button class="btn-icon text-muted hover:text-red-500" title="Delete Event" onclick="removeEvent('${ev.id}')">Ã—</button>
+                        <button class="btn-icon text-muted hover:text-red-500" title="Delete Event" onclick="removeEvent('${ev.id}')">×</button>
                     </div>
                 </div>
                 <input class="w-full" style="border:none;background:transparent" value="${ev.text}" onchange="updateEvent('${ev.id}',this.value)">
@@ -1433,10 +1433,10 @@
                         </div>
                         <div class="mb-2 p-2 bg-gray-900 rounded border border-gray-700 flex flex-col gap-1">
                             <div class="text-xs font-bold text-muted uppercase border-b border-gray-700 pb-1 mb-1">Objectives Reminder</div>
-                            ${(AppState.mission.prep.missionObjs || []).length > 0 ? `<div class="text-xs mb-1"><span class="font-bold text-accent">MISSION:</span> <div class="text-white mt-0.5">${AppState.mission.prep.missionObjs.map(o => `<div style="margin-left:8px; margin-bottom:2px">â€¢ ${o.text}</div>`).join('')}</div></div>` : ''}
-                            ${(AppState.mission.prep.tacticalObjs || []).length > 0 ? `<div class="text-xs mb-1"><span class="font-bold text-accent">TACTICAL:</span> <div class="text-white mt-0.5">${AppState.mission.prep.tacticalObjs.map(o => `<div style="margin-left:8px; margin-bottom:2px">â€¢ ${o.text}</div>`).join('')}</div></div>` : ''}
-                            ${(AppState.mission.prep.perfObjs || []).length > 0 ? `<div class="text-xs mb-1"><span class="font-bold text-accent">PERF:</span> <div class="text-white mt-0.5">${AppState.mission.prep.perfObjs.map(o => `<div style="margin-left:8px; margin-bottom:2px">â€¢ ${o.text}</div>`).join('')}</div></div>` : ''}
-                            ${(AppState.mission.prep.dlos || []).length > 0 ? `<div class="text-xs mb-1"><span class="font-bold text-accent">DLO:</span> <div class="text-white mt-0.5">${AppState.mission.prep.dlos.map(o => `<div style="margin-left:8px; margin-bottom:2px">â€¢ ${o.text}</div>`).join('')}</div></div>` : ''}
+                            ${(AppState.mission.prep.missionObjs || []).length > 0 ? `<div class="text-xs mb-1"><span class="font-bold text-accent">MISSION:</span> <div class="text-white mt-0.5">${AppState.mission.prep.missionObjs.map(o => `<div style="margin-left:8px; margin-bottom:2px">• ${o.text}</div>`).join('')}</div></div>` : ''}
+                            ${(AppState.mission.prep.tacticalObjs || []).length > 0 ? `<div class="text-xs mb-1"><span class="font-bold text-accent">TACTICAL:</span> <div class="text-white mt-0.5">${AppState.mission.prep.tacticalObjs.map(o => `<div style="margin-left:8px; margin-bottom:2px">• ${o.text}</div>`).join('')}</div></div>` : ''}
+                            ${(AppState.mission.prep.perfObjs || []).length > 0 ? `<div class="text-xs mb-1"><span class="font-bold text-accent">PERF:</span> <div class="text-white mt-0.5">${AppState.mission.prep.perfObjs.map(o => `<div style="margin-left:8px; margin-bottom:2px">• ${o.text}</div>`).join('')}</div></div>` : ''}
+                            ${(AppState.mission.prep.dlos || []).length > 0 ? `<div class="text-xs mb-1"><span class="font-bold text-accent">DLO:</span> <div class="text-white mt-0.5">${AppState.mission.prep.dlos.map(o => `<div style="margin-left:8px; margin-bottom:2px">• ${o.text}</div>`).join('')}</div></div>` : ''}
                             ${(!AppState.mission.prep.missionObjs?.length && !AppState.mission.prep.tacticalObjs?.length && !AppState.mission.prep.perfObjs?.length && !AppState.mission.prep.dlos?.length) ? `<div class="text-xs text-muted italic">No Objectives defined.</div>` : ''}
                         </div>
                         <div class="flex-1 overflow-y-auto pr-2 bg-black/20 rounded p-2">
@@ -1484,7 +1484,7 @@
                                     <input type="radio" name="rc_grp_${active.id}" ${active.rcIndex === i ? 'checked' : ''} onclick="updateCfRc(${i})"> 
                                     ${active.rcIndex === i ? 'Selected RC' : 'Select as RC'}
                                 </label>
-                                <button class="btn-icon text-xs hover:text-red-500" onclick="removeCf(${i})">Ã—</button>
+                                <button class="btn-icon text-xs hover:text-red-500" onclick="removeCf(${i})">×</button>
                             </div>
                         </div>
                         <textarea class="w-full font-bold mb-1" rows="1" placeholder="Describe Factor..." oninput="autoResize(this)" onchange="updateCf(${i},'factor',this.value)">${cf.factor}</textarea>
@@ -1500,7 +1500,7 @@
                                 <div class="mt-1 pl-4 border-l-2 border-gray-700">
                                     <div class="flex justify-between items-center mb-1">
                                         <span class="text-[10px] text-muted uppercase tracking-wider">Mini-IF</span>
-                                        <button class="btn-icon text-xs hover:text-red-500" title="Remove Mini-IF" onclick="updateCf(${i},'miniIf',undefined)">Ã—</button>
+                                        <button class="btn-icon text-xs hover:text-red-500" title="Remove Mini-IF" onclick="updateCf(${i},'miniIf',undefined)">×</button>
                                     </div>
                                     <textarea class="w-full text-sm bg-gray-800 p-1 rounded" rows="1" placeholder="Next time I will..." oninput="autoResize(this)" onchange="updateCf(${i},'miniIf',this.value)">${cf.miniIf}</textarea>
                                 </div>
@@ -1699,7 +1699,7 @@
                                 <div style="margin-bottom:1rem; padding-left:1rem; border-left:3px solid ${isRc ? 'var(--accent-secondary)' : '#334155'}">
                                     <div class="text-xs font-bold text-muted uppercase" style="margin-bottom:0.25rem; letter-spacing:0.5px">
                                         CF #${i + 1}
-                                        ${isRc ? '<span style="color:var(--accent-secondary); margin-left:0.5rem">â¬¤ ROOT CAUSE</span>' : ''}
+                                        ${isRc ? '<span style="color:var(--accent-secondary); margin-left:0.5rem">⬤ ROOT CAUSE</span>' : ''}
                                     </div>
                                     <div class="text-sm ${isRc ? 'font-bold' : ''}">${cf.factor}</div>
                                     
@@ -1739,7 +1739,7 @@
                 container.innerHTML = `
                     <h2 class="text-xl font-bold mb-6 text-white no-print">6. Final Output</h2>
                     
-                    <!-- â•â•â•â•â•â• HEADER â•â•â•â•â•â• -->
+                    <!-- ══════ HEADER ══════ -->
                     <div class="card" style="border-left:4px solid var(--accent-primary); margin-bottom:2.5rem; padding:1.5rem;">
                         <div class="text-xs font-bold text-muted uppercase tracking-widest mb-3">Debrief Report</div>
                         <h1 class="text-3xl font-bold mb-2" style="color:var(--accent-primary)">${m.meta.title || 'Untitled Mission'}</h1>
@@ -1760,7 +1760,7 @@
                         </div>` : ''}
                     </div>
 
-                    <!-- â•â•â•â•â•â• OBJECTIVES â•â•â•â•â•â• -->
+                    <!-- ══════ OBJECTIVES ══════ -->
                     <div class="card" style="margin-bottom:2.5rem; padding:1.5rem;">
                         <div class="section-title" style="font-size:1.2rem; margin-bottom:1.5rem;">Objectives</div>
                         
@@ -1815,7 +1815,7 @@
                     </div>
                     ` : ''}
 
-                    <!-- â•â•â•â•â•â• TIMELINE â•â•â•â•â•â• -->
+                    <!-- ══════ TIMELINE ══════ -->
                     ${sortedEvents.length > 0 ? `
                     <div class="card" style="margin-bottom:2.5rem; padding:1.5rem;">
                         <div class="section-title" style="font-size:1.2rem; margin-bottom:1.5rem;">Event Timeline</div>
@@ -1828,14 +1828,14 @@
                     return `<div style="display:flex; align-items:flex-start; gap:1rem; padding:0.6rem 0.75rem; border-left:3px solid ${borderColor}; background:${bgColor}; border-radius:0 6px 6px 0;">
                                     <span class="font-mono text-xs text-muted" style="min-width:55px;">${ev.time.slice(11, 19)}</span>
                                     <span class="text-sm" style="flex:1;">${ev.text}</span>
-                                    ${isDfpCandidate ? `<span class="text-xs font-bold" style="color:${candType === 'LP' ? 'white' : 'var(--accent-primary)'}">â˜… ${candType}</span>` : ''}
+                                    ${isDfpCandidate ? `<span class="text-xs font-bold" style="color:${candType === 'LP' ? 'white' : 'var(--accent-primary)'}">★ ${candType}</span>` : ''}
                                 </div>`;
                 }).join('')}
                         </div>
                     </div>
                     ` : ''}
 
-                    <!-- â•â•â•â•â•â• DFPs â•â•â•â•â•â• -->
+                    <!-- ══════ DFPs ══════ -->
                     ${dfpItems.length > 0 ? `
                     <div style="margin-bottom:2.5rem; page-break-before: always; break-before: page;">
                         <div style="font-size:1.2rem; font-weight:bold; color:var(--accent-primary); border-bottom:2px solid var(--accent-primary); padding-bottom:0.75rem; margin-bottom:1.5rem;">Debrief Focus Points (${dfpItems.length})</div>
@@ -1843,7 +1843,7 @@
                     </div>
                     ` : ''}
 
-                    <!-- â•â•â•â•â•â• LPs â•â•â•â•â•â• -->
+                    <!-- ══════ LPs ══════ -->
                     ${lpItems.length > 0 ? `
                     <div style="margin-bottom:2.5rem; page-break-before: always; break-before: page;">
                         <div style="font-size:1.2rem; font-weight:bold; color:var(--accent-primary); border-bottom:2px solid var(--accent-primary); padding-bottom:0.75rem; margin-bottom:1.5rem;">Learning Points (${lpItems.length})</div>
@@ -1851,7 +1851,7 @@
                     </div>
                     ` : ''}
 
-                    <!-- â•â•â•â•â•â• FINAL SUMMARY â•â•â•â•â•â• -->
+                    <!-- ══════ FINAL SUMMARY ══════ -->
                     <div class="card print-summary" style="border-left:4px solid #10B981; margin-bottom:2.5rem; padding:1.5rem;">
                         <div class="section-title" style="font-size:1.2rem; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center;">
                             <span>Final Summary & Trends</span>
@@ -1872,7 +1872,7 @@
 
                     <!-- PRINT BUTTON -->
                     <div class="text-center" style="margin-top:3rem; margin-bottom:2rem;" class="no-print">
-                        <button class="btn btn-primary" style="padding:14px 40px; font-size:16px;" onclick="window.print()">ðŸ–¨ï¸ Print to PDF</button>
+                        <button class="btn btn-primary" style="padding:14px 40px; font-size:16px;" onclick="window.print()">🖨️ Print to PDF</button>
                     </div>
                 `;
             }
@@ -2170,7 +2170,7 @@ Based strictly on the analysis above, write the perfect Lesson Learned Summary i
                 const btn = document.querySelector('button[title="Copy AI Prompt for L2 Generation"]');
                 if (btn) {
                     const original = btn.innerHTML;
-                    btn.innerHTML = "âœ…";
+                    btn.innerHTML = "✅";
                     setTimeout(() => btn.innerHTML = original, 1500);
                 }
             });
@@ -2239,7 +2239,7 @@ Based strictly on the analysis above, write the perfect Lesson Learned Summary i
                 const btn = document.getElementById('btn-copy-summary-prompt');
                 if (btn) {
                     const original = btn.innerHTML;
-                    btn.innerHTML = "âœ…";
+                    btn.innerHTML = "✅";
                     setTimeout(() => btn.innerHTML = original, 1500);
                 }
             });
@@ -2267,4 +2267,3 @@ Based strictly on the analysis above, write the perfect Lesson Learned Summary i
 </body>
 
 </html>
-
