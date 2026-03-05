@@ -1276,7 +1276,7 @@
             "OBJ_AREA": { title: "Objective Area Analysis", text: "Comparison of Expected vs Actual conditions in the target area and their impact." },
             "FORCE_INT": { title: "Force Integration", text: "Contracts and Deconfliction issues (Intra-flight and with other Blue players)." },
             "AI_PROMPT": { title: "AI Prompt Generator", text: "Copies a structured prompt designed for AI assistants. Use this to generate a concise Lesson Learned Summary based on your analysis, following the Debrief Primer methodology." },
-            "AI_SUMMARY_PROMPT": { title: "AI Final Summary Prompt", text: "Copies a complete mission context prompt. Use this to ask an AI to write a professional 'Final Summary & Trends' assessment in English and French, based on all objectives and analysis." }
+            "AI_SUMMARY_PROMPT": { title: "AI Final Summary Prompt", text: "Copies a mission-context prompt for a very short bilingual 'Final Summary & Trends' output. Designed to return only a few operational bullet points tied to mission result, main trend/root cause, and next-time fix." }
         };
 
         const PHASES = [
@@ -2618,18 +2618,22 @@ Based strictly on the analysis above, write the perfect Lesson Learned Summary i
          ${sections.join('\n\n')}
 
          INSTRUCTIONS:
-         1. Identify only the most important trends and takeaways.
+         1. Follow the Debrief Primer intent for the final summary: tie lessons back to mission objectives, highlight the main trend, and state clearly how to employ better next time.
          2. Keep the answer extremely concise. No paragraph. No introduction. No conclusion.
-         3. Output only bullet points.
-         4. Maximum format:
-            - French (Francais): 3 bullet points maximum
-            - English (Anglais): 3 bullet points maximum
-         5. Each bullet must be short and operational.
-         6. Prioritize:
-            - mission effectiveness
-            - main recurring root cause or trend
-            - key corrective action / lesson learned
-         7. Use a professional, constructive, and instructional tone.`;
+         3. Output only bullet points, using exactly this structure:
+            French (Francais):
+            - Mission result: ...
+            - Main trend / root cause: ...
+            - Next time: ...
+            English (Anglais):
+            - Mission result: ...
+            - Main trend / root cause: ...
+            - Next time: ...
+         4. Each bullet must be short, operational, and grounded in the provided data.
+         5. Mention only the most important recurring trend(s). If a trend was repeated across several DFPs/LPs, prioritize it.
+         6. The "Next time" bullet must describe the key instructional fix in practical terms, not restate the problem.
+         7. If the evidence is incomplete, say so briefly instead of inventing certainty.
+         8. Use a professional, constructive, and instructional tone.`;
 
             navigator.clipboard.writeText(prompt).then(() => {
                 const btn = document.getElementById('btn-copy-summary-prompt');
