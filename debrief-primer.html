@@ -1235,12 +1235,10 @@
             <div id="footer-actions-panel" class="footer-actions-panel">
             <input type="file" id="import-json" style="display:none" accept=".json" onchange="Storage.importJSON(this)">
             <button id="btn-load-json" class="btn btn-secondary header-btn"
-                onclick="document.getElementById('import-json').click()">0. Load JSON 📂</button>
-            <button id="btn-save" class="btn btn-secondary header-btn" onclick="Storage.exportJSON()">1. Export JSON
-                💾</button>
+                onclick="document.getElementById('import-json').click()">Load JSON 📂</button>
             <button id="btn-qwi" class="btn btn-secondary header-btn"
                 style="border-color:var(--accent-primary); color:var(--accent-primary)" onclick="Storage.sendQwiEmail()"
-                title="JSON payload is embedded at the end of the email body.">2. Send to QWI 📧</button>
+                title="JSON payload is embedded at the end of the email body.">Send to QWI 📧</button>
             <button id="btn-reset" class="btn btn-secondary header-btn" onclick="Storage.reset()">🗑️ Reset</button>
             </div>
         </div>
@@ -1445,15 +1443,6 @@
                 }
             },
             reset: () => { if (confirm("Reset all data?")) { localStorage.clear(); location.reload(); } },
-            exportJSON: () => {
-                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(AppState.mission, null, 2));
-                const dlAnchor = document.createElement('a');
-                dlAnchor.setAttribute("href", dataStr);
-                dlAnchor.setAttribute("download", `debrief_${AppState.mission.meta.title || 'mission'}_${new Date().toISOString().slice(0, 10)}.json`);
-                document.body.appendChild(dlAnchor); dlAnchor.click(); dlAnchor.remove();
-                Ui.showToast('JSON exported');
-                Ui.closeActionsMenu();
-            },
             sendQwiEmail: () => {
                 const title = AppState.mission.meta.title || "Mission";
                 const date = AppState.mission.meta.date || "Unknown Date";
