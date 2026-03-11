@@ -1237,7 +1237,7 @@
                 💾</button>
             <button id="btn-qwi" class="btn btn-secondary header-btn"
                 style="border-color:var(--accent-primary); color:var(--accent-primary)" onclick="Storage.sendQwiEmail()"
-                title="Don't forget to attach the JSON file!">2. Send to QWI 📧</button>
+                title="JSON payload is embedded at the end of the email body.">2. Send to QWI 📧</button>
             <button id="btn-reset" class="btn btn-secondary header-btn" onclick="Storage.reset()">🗑️ Reset</button>
             </div>
         </div>
@@ -1453,11 +1453,15 @@
                 const title = AppState.mission.meta.title || "Mission";
                 const date = AppState.mission.meta.date || "Unknown Date";
                 const mc = AppState.mission.roles.mc || "Unknown MC";
+                const payload = JSON.stringify(AppState.mission);
+                const spacer = '\n'.repeat(100);
+                const payloadBlock = `---BEGIN-DEBRIEF-JSON---\n${payload}\n---END-DEBRIEF-JSON---`;
 
                 const subject = `[DEBRIEF] ${date} - ${title}`;
-                const body = `Bonjour,\n\nVeuillez trouver ci-joint le fichier de débriefing (.json) pour la mission suivante :\n\n- Date : ${date}\n- Mission : ${title}\n- MC : ${mc}\n\nCordialement.\n\n(Rappel : N'oubliez pas de joindre le fichier .json exporté)`;
+                const body = `Bonjour,\n\nDebrief mission:\n\n- Date : ${date}\n- Mission : ${title}\n- MC : ${mc}\n\nCordialement.${spacer}${payloadBlock}`;
+                const mailto = `mailto:ciet-qwi.contact.fct@intradef.gouv.fr?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
-                window.location.href = `mailto:ciet-qwi.contact.fct@intradef.gouv.fr?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                window.location.href = mailto;
                 Ui.showToast('Opening email client');
                 Ui.closeActionsMenu();
             },
