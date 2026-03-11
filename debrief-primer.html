@@ -1459,11 +1459,10 @@
                 const date = AppState.mission.meta.date || "Unknown Date";
                 const mc = AppState.mission.roles.mc || "Unknown MC";
                 const payload = JSON.stringify(AppState.mission);
-                const spacer = '\n'.repeat(100);
-                const payloadBlock = `---BEGIN-DEBRIEF-JSON---\n${payload}\n---END-DEBRIEF-JSON---`;
+                const payloadBlock = `\n==================== DEBRIEF JSON PAYLOAD ====================\n---BEGIN-DEBRIEF-JSON---\n${payload}\n---END-DEBRIEF-JSON---\n==============================================================`;
 
                 const subject = `[DEBRIEF] ${date} - ${title}`;
-                const body = `Bonjour,\n\nDebrief mission:\n\n- Date : ${date}\n- Mission : ${title}\n- MC : ${mc}\n\nCordialement.${spacer}${payloadBlock}`;
+                const body = `Bonjour,\n\nDebrief mission:\n\n- Date : ${date}\n- Mission : ${title}\n- MC : ${mc}\n\nCordialement.${payloadBlock}`;
                 const mailto = `mailto:ciet-qwi.contact.fct@intradef.gouv.fr?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
                 window.location.href = mailto;
