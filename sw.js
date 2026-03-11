@@ -1,15 +1,27 @@
-const CACHE_NAME = 'debrief-primer-shell-v2';
-const APP_SHELL = [
+const CACHE_NAME = 'debrief-primer-shell-v3';
+const CORE_ASSETS = ['./debrief-primer.html'];
+const OPTIONAL_ASSETS = [
   './',
-  './debrief-primer.html',
   './manifest.webmanifest',
   './icons/icon-192.svg',
   './icons/icon-512.svg'
 ];
 
+async function putInCache(cache, url) {
+  const request = new Request(url, { cache: 'reload' });
+  const response = await fetch(request);
+  if (response && response.ok) {
+    await cache.put(url, response.clone());
+  }
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+      await Promise.all(CORE_ASSETS.map((url) => putInCache(cache, url)));
+      await Promise.allSettled(OPTIONAL_ASSETS.map((url) => putInCache(cache, url)));
+    })()
   );
   self.skipWaiting();
 });
@@ -44,35 +56,60 @@ self.addEventListener('fetch', (event) => {
 
   if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put('./debrief-primer.html', copy));
-          return response;
-        })
-        .catch(async () => {
-          const cache = await caches.open(CACHE_NAME);
-          return cache.match('./debrief-primer.html');
-        })
+      (async () => {
+        const cache = await caches.open(CACHE_NAME);
+        const cachedShell = await cache.match('./debrief-primer.html');
+
+        const networkPromise = fetch(request)
+          .then(async (response) => {
+            if (response && response.ok) {
+              await cache.put('./debrief-primer.html', response.clone());
+            }
+            return response;
+          })
+          .catch(() => null);
+
+        if (cachedShell) {
+          event.waitUntil(networkPromise);
+          return cachedShell;
+        }
+
+        const networkResponse = await networkPromise;
+        if (networkResponse) {
+          return networkResponse;
+        }
+
+        return new Response('Offline', { status: 503, statusText: 'Offline' });
+      })()
     );
     return;
   }
 
   event.respondWith(
-    caches.match(request).then((cached) => {
+    (async () => {
+      const cached = await caches.match(request, { ignoreSearch: true });
       if (cached) {
         return cached;
       }
 
-      return fetch(request).then((response) => {
+      try {
+        const response = await fetch(request);
         if (!response || response.status !== 200 || response.type !== 'basic') {
           return response;
         }
 
         const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+        const cache = await caches.open(CACHE_NAME);
+        await cache.put(request, copy);
         return response;
-      });
-    })
+      } catch {
+        if (request.destination === 'document') {
+          const cache = await caches.open(CACHE_NAME);
+          const fallback = await cache.match('./debrief-primer.html');
+          if (fallback) return fallback;
+        }
+        return new Response('', { status: 503, statusText: 'Offline' });
+      }
+    })()
   );
 });

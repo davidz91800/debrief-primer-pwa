@@ -2648,9 +2648,28 @@ Based strictly on the analysis above, write the perfect Lesson Learned Summary i
     <script>
         (function registerPwa() {
             if (!('serviceWorker' in navigator)) return;
+
+            const activateWaitingWorker = (registration) => {
+                if (registration && registration.waiting) {
+                    registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                }
+            };
+
             window.addEventListener('load', async () => {
                 try {
-                    await navigator.serviceWorker.register('./sw.js', { scope: './' });
+                    const registration = await navigator.serviceWorker.register('./sw.js', { scope: './' });
+                    activateWaitingWorker(registration);
+                    await registration.update();
+
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        if (!newWorker) return;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed') {
+                                activateWaitingWorker(registration);
+                            }
+                        });
+                    });
                 } catch (error) {
                     console.warn('Service worker registration failed:', error);
                 }
