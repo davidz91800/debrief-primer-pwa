@@ -516,11 +516,11 @@
         #tooltip-container.touch-open {
             display: block;
             left: 50% !important;
-            top: auto !important;
-            bottom: max(16px, env(safe-area-inset-bottom));
-            transform: translateX(-50%);
+            top: 50% !important;
+            bottom: auto;
+            transform: translate(-50%, -50%);
             width: min(92vw, 560px);
-            max-height: 55vh;
+            max-height: min(72vh, 700px);
             overflow-y: auto;
             pointer-events: auto;
             z-index: 1000;
