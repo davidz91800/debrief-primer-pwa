@@ -1,5 +1,5 @@
-const CACHE_NAME = 'debrief-primer-shell-v3';
-const CORE_ASSETS = ['./debrief-primer.html'];
+const CACHE_NAME = 'debrief-primer-shell-v4';
+const CORE_ASSETS = ['./', './index.html'];
 const OPTIONAL_ASSETS = [
   './',
   './manifest.webmanifest',
@@ -58,12 +58,12 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       (async () => {
         const cache = await caches.open(CACHE_NAME);
-        const cachedShell = await cache.match('./debrief-primer.html');
+        const cachedShell = await cache.match('./index.html');
 
         const networkPromise = fetch(request)
           .then(async (response) => {
             if (response && response.ok) {
-              await cache.put('./debrief-primer.html', response.clone());
+              await cache.put('./index.html', response.clone());
             }
             return response;
           })
@@ -105,7 +105,7 @@ self.addEventListener('fetch', (event) => {
       } catch {
         if (request.destination === 'document') {
           const cache = await caches.open(CACHE_NAME);
-          const fallback = await cache.match('./debrief-primer.html');
+          const fallback = await cache.match('./index.html');
           if (fallback) return fallback;
         }
         return new Response('', { status: 503, statusText: 'Offline' });

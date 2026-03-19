@@ -1,8 +1,8 @@
 {
   "name": "Debrief Primer PWA",
-  "short_name": "DebriefPrimer",
+  "short_name": "Debrief",
   "description": "Debrief Primer V1.2 - Advanced Debriefing Tool",
-  "start_url": "./debrief-primer.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#0f172a",
